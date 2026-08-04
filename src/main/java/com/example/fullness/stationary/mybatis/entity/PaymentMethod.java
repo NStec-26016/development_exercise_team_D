@@ -6,7 +6,8 @@ import lombok.Data;
 
 @Data
 public class PaymentMethod implements Serializable{
-    
+    private Integer id;
+
     private String name; 
    
     

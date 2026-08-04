@@ -6,6 +6,9 @@ import lombok.Data;
 
 @Data
 public class Employee implements Serializable{
+
+    private Integer id;
+    
     
     private Integer departmentId;
 

@@ -7,6 +7,7 @@ import lombok.Data;
 @Data
 public class Department implements Serializable{
     
+    private Integer id;
 
     private String Name;
 }

@@ -6,6 +6,7 @@ import lombok.Data;
 
 @Data
 public class OrderDetail implements Serializable{
+    private Integer id;
 
     private Integer orderId;
 

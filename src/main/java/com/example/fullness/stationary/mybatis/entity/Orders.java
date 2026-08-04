@@ -7,7 +7,8 @@ import lombok.Data;
 
 @Data
 public class Orders implements Serializable{
-    
+    private Integer id;
+
     private Integer customerId;
 
     private Integer orderStatusId;
@@ -17,6 +18,6 @@ public class Orders implements Serializable{
     private LocalDateTime orderDate;
 
     private Integer amountTotal;
-    
+
 
 }

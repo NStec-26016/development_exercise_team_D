@@ -7,7 +7,8 @@ import lombok.Data;
 
 @Data
 public class Customer implements Serializable{
-    
+    private Integer id;
+
     private String name;
 
     private String nameKana;
