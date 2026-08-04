@@ -1,13 +1,15 @@
 package com.example.fullness.stationary.mybatis.entity;
 
+import java.io.Serializable;
+
 import lombok.Data;
 
 @Data
-public class EmployeeAccount {
+public class Employee implements Serializable{
     
-    private Integer userId;
+    private Integer departmentId;
 
-    private String userName;
+    private String name;
 
-    private Integer password;
+    private String nameKana;
 }
