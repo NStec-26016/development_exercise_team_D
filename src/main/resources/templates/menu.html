@@ -1,9 +1,10 @@
 <!--
 /**
- * 画面名：メニュー
+ * 画面名：メニュー（Spring Security本番連携版）
  * 
  * <p>システムの主軸となるメニュー画面を提供します。
- * 本画面は、ユーザーのログイン状態（認証状態）に応じてヘッダーおよびフッターの表示項目を動的に切り替えます。</p>
+ * Spring Securityの認証状態を「sec:authorize」タグで検知し、
+ * ログイン前（匿名ユーザー）とログイン後（認証済みユーザー）でヘッダー・フッターの項目を動的に出し分けます。</p>
  * 
  * <h2>項目定義一覧</h2>
  * <h3>ヘッダー</h3>
@@ -43,11 +44,13 @@
  *   <li>ヘッダーおよびフッターには、全体を区切るための緑色の直線（2px）を配置する。</li>
  * </ul>
  * 
- * @author Team_D 深堀
+ * @author Team_D
+ * @version 1.0.2
  */
 -->
 <!DOCTYPE html>
-<html xmlns:th="http://thymeleaf.org">
+<html xmlns:th="http://thymeleaf.org" xmlns:sec="http://thymeleaf.org/extras/spring-security">
+<!-- 💡必須：Spring Securityタグを使うための宣言 -->
 
 <head>
     <meta charset="UTF-8">
@@ -191,10 +194,13 @@
     <header>
         <div class="site-title" th:text="'Team_D文具管理画面'">Team_D文具管理画面</div>
         <nav>
-            <th:block th:if="${loginUserName == null}">
+            <!-- 💡 ログイン前（未認証状態）のみ表示する項目 -->
+            <th:block sec:authorize="isAnonymous()">
                 <a th:href="@{/login}" th:text="'ログイン'">ログイン</a>
             </th:block>
-            <th:block th:if="${loginUserName != null}">
+
+            <!-- 💡 ログイン後（認証済み状態）のみ表示する項目 -->
+            <th:block sec:authorize="isAuthenticated()">
                 <a th:href="@{/product/maintenance}" th:text="'商品情報メンテナンス'">商品情報メンテナンス</a>
                 <a th:href="@{/category/add}" th:text="'商品カテゴリ登録'">商品カテゴリ登録</a>
                 <a th:href="@{/history/search}" th:text="'購入履歴検索'">購入履歴検索</a>
@@ -209,10 +215,12 @@
     <div class="main-content">
         <h1 th:text="'メニュー'">メニュー</h1>
 
-        <div class="welcome-area" th:if="${loginUserName != null}">
-            <p th:text="'ようこそ、' + ${loginUserName} + 'さん'">ようこそ、ユーザーさん</p>
+        <!-- 💡 ログイン後（認証済み状態）のみウェルカムメッセージと画像を表示 -->
+        <div class="welcome-area" sec:authorize="isAuthenticated()">
+            <!-- 💡 sec:authentication="name" を使うことで、ログイン中の本物のID・ユーザー名が自動出力されます -->
+            <p>ようこそ、<span sec:authentication="name">ユーザー名</span>さん</p>
             <div class="welcome-image-container">
-                <img th:src="@{/images/Shop_Img1.jpeg}" alt="ウェルカム画像" />
+                <img th:src="@{/images/welcome.png}" alt="ウェルカム画像" />
             </div>
         </div>
     </div>
@@ -226,7 +234,8 @@
                     <a th:href="@{/menu}" th:text="'トップ'">トップ</a>
                 </div>
 
-                <th:block th:if="${loginUserName != null}">
+                <!-- 💡 フッターの2〜8番もログイン後のみ表示されるよう一括制御 -->
+                <th:block sec:authorize="isAuthenticated()">
                     <div class="footer-nav-item">
                         <a th:href="@{/product/search}" th:text="'商品検索'">商品検索</a>
                     </div>
@@ -238,8 +247,9 @@
                     </div>
                     <div class="footer-nav-item">
                         <form th:action="@{/logout}" method="post" class="logout-form">
-                            <button type="submit" class="footer-logout-btn" th:text="'ログアウト（' + ${loginUserName} + '）'">
-                                ログアウト（〇〇さん）
+                            <!-- 💡 ログアウトボタンの中の文言にも本物のユーザー名を自動埋め込み -->
+                            <button type="submit" class="footer-logout-btn">
+                                ログアウト（<span sec:authentication="name">〇〇</span>）
                             </button>
                         </form>
                     </div>

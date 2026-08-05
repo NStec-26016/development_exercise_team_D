@@ -1,44 +1,59 @@
 package com.example.fullness.stationary.controller;
 
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
 
 /**
  * ログインおよびメニュー画面の画面遷移を制御するコントローラークラス。
+ * <p>
+ * 本クラスは、認証画面（Login）の表示制御、および認証成功後のメニュー画面（Menu）の表示制御を行います。
+ * 実際の認証判定、セッション管理、ログアウトのロジックはSpring Securityのフィルター層によって自動処理されます。
+ * </p>
+ * 
+ * @author Team_D 深堀
  */
 @Controller
 public class LoginController {
 
     /**
-     * ブラウザにメニュー画面を表示します。
+     * ログイン画面を表示します。
      * <p>
-     * URL「/menu」にアクセスした際に、templates/menu.html を呼び出します。
+     * URL「/login」へのGETリクエストに対して、ログイン用HTML（templates/login.html）を返却します。
      * </p>
      *
-     * @param model 画面にデータを渡すためのオブジェクト
-     * @return 遷移先HTMLのファイル名 "menu"
+     * @return ログイン画面のビュー名 "login"
      */
-    @GetMapping("/menu")
+    @GetMapping("/admin/login")
+    public String showLoginPage() {
+        return "login";
+    }
+
+    /**
+     * メニュー画面を表示します。
+     * <p>
+     * URL「/menu」へのGETリクエストを処理します。
+     * Spring Securityのコンテキストから現在ログイン中の認証情報を取得し、
+     * ログイン済みであればユーザー名を画面（Model）に設定します。
+     * 未ログインの場合は、ユーザー名を設定せずに画面を表示します。
+     * </p>
+     *
+     * @param model 画面へデータを渡すためのModelオブジェクト
+     * @return メニュー画面のビュー名 "menu"
+     */
+    @GetMapping("/admin")
     public String showMenuPage(Model model) {
 
-        // 💡テスト用に、画面（menu.html）の ${loginUserName} に表示する仮の名前をセットします
-        model.addAttribute("loginUserName", "テストユーザー");
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
-        return "menu"; // templates/menu.html を呼び出す
-    }
+        if (authentication != null && authentication.isAuthenticated()
+                && !"anonymousUser".equals(authentication.getName())) {
+            String loginUserName = authentication.getName();
+            model.addAttribute("loginUserName", loginUserName);
+        }
 
-    // ログインボタン（POST）を受け取る窓口
-    @PostMapping("/login") // 👈 ここが @PostMapping になっていますか？
-    public String loginTest(Model model) {
-        model.addAttribute("loginUserName", "山田 太郎（テストログイン）");
         return "menu";
-    }
-
-    // 💡 1. ブラウザで /login と打ち込んだときに、ログイン画面を表示する窓口（今回追加）
-    @GetMapping("/login")
-    public String showLoginPage() {
-        return "login"; // src/main/resources/templates/login.html を呼び出す
     }
 }
