@@ -1,17 +1,31 @@
 package com.example.fullness.stationary.mybatis.repository;
 
-import com.example.fullness.stationary.mybatis.entity.Employee;
+import org.apache.ibatis.annotations.Mapper;
+import org.springframework.data.repository.query.Param;
+import org.springframework.stereotype.Repository;
 
-// @Data
-public class EmployeeAccountRepository {
+import com.example.fullness.stationary.mybatis.entity.EmployeeAccount;
 
-    private String userName;
+/**
+ * 担当者アカウントに関するデータアクセスを管理するリポジトリインターフェース。
+ * 社員アカウントテーブル（employee_account）、社員テーブル（employee）、
+ * 部署テーブル（department）等の連携データを操作する。
+ */
+@Mapper
+@Repository
 
-    private String password;
+public interface EmployeeAccountRepository {
+    /**
+     * 【UC17 担当者ログイン】
+     * 入力されたアカウント名（ログイン名）をキーに、担当者のアカウント情報を1件取得する。
+     * ログイン後のセッション情報として利用するため、紐づく「社員情報（名前・ふりがな）」
+     * および「部署情報（部署名）」をテーブル結合（JOIN）した状態で取得する。
+     * 
+     * @param name ログイン画面から入力されたアカウント名（識別子）
+     * @return 該当する {@link EmployeeAccount} オブジェクト。存在しない場合は {@code null}
+     */
+    EmployeeAccount findByName(@Param("name") String name);
 
-    public Employee findByAcountName(String username2) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'findByAcountName'");
-    }
-
+    // UC09 担当者アカウント登録
+    int insertEmployeeAccount(EmployeeAccount employeeAccount);
 }
