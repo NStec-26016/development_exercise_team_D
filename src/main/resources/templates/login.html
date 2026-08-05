@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<!-- <html xmlns:th="http://thymeleaf.org"> -->
+
+<head>
+    <meta charset="UTF-8">
+    <title>ログイン - メニューシステム</title>
+    <!-- ここに必要に応じてCSSのリンクなどを追加してください -->
+</head>
+
+<body>
+
+    <div style="text-align: center; margin-top: 50px;">
+        <h1>メニューシステム ログイン</h1>
+
+        <!-- ログイン失敗時にSpring Securityが自動で付与するURLパラメータ(?error)を検知して表示 -->
+        <div th:if="${param.error}" style="color: red; margin-bottom: 20px;">
+            ユーザーIDまたはパスワードが正しくありません。
+        </div>
+
+        <!-- ログアウト成功時にSpring Securityが自動で付与するURLパラメータ(?logout)を検知して表示 -->
+        <div th:if="${param.logout}" style="color: green; margin-bottom: 20px;">
+            ログアウトしました。
+        </div>
+
+        <!-- ログインフォーム本体 -->
+        <form th:action="@{/login}" method="post" style="display: inline-block; text-align: left;">
+            <div style="margin-bottom: 15px;">
+                <label th:for="username" style="display: block;">ユーザーID：</label>
+                <input type="text" id="username" name="username" required style="width: 200px; padding: 5px;" />
+            </div>
+
+            <div style="margin-bottom: 15px;">
+                <label th:for="password" style="display: block;">パスワード：</label>
+                <input type="password" id="password" name="password" required style="width: 200px; padding: 5px;" />
+            </div>
+
+            <div style="text-align: center;">
+                <button type="submit" style="padding: 5px 20px;">ログイン</button>
+            </div>
+        </form>
+    </div>
+
+</body>
+
+</html>

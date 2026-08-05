@@ -2,51 +2,43 @@ package com.example.fullness.stationary.controller;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.validation.BindingResult;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 
-import com.example.fullness.stationary.form.LoginForm;
-
-// @Controller
-// @RequestMapping("exe01")
 /**
- * <b>概要：ログイン・メニュー画面遷移制御コントローラー</b><br>
- * メニュー画面からログイン画面への遷移、およびログイン認証後のリダイレクト処理を制御します。
- * 
- * @author Team_D 深堀
+ * ログインおよびメニュー画面の画面遷移を制御するコントローラークラス。
  */
+@Controller
 public class LoginController {
 
     /**
-     * ログイン画面の表示
-     * 
-     * @param error ログイン失敗時にURLに付与される "?error" を検知するパラメータ
-     * @return login.htmlを表示
-     */
-    @GetMapping("/login")
-    public String showLoginForm(@ModelAttribute LoginForm form,
-            @RequestParam(value = "error", required = false) String error,
-            Model model) {
-
-        // 💡 要件2：アカウント名又はパスワードが間違っていた場合（SecurityConfigのfailureUrlから遷移）
-        if (error != null) {
-            model.addAttribute("errorMessage", "アカウント名又はパスワードが間違っています。");
-        }
-
-        return "login";
-    }
-
-    /**
-     * メニュー画面の表示
+     * ブラウザにメニュー画面を表示します。
+     * <p>
+     * URL「/menu」にアクセスした際に、templates/menu.html を呼び出します。
+     * </p>
+     *
+     * @param model 画面にデータを渡すためのオブジェクト
+     * @return 遷移先HTMLのファイル名 "menu"
      */
     @GetMapping("/menu")
-    public String showMenu() {
-        return "menu"; // menu.htmlを表示（ログインしていないとSecurityConfigに弾かれます）
+    public String showMenuPage(Model model) {
+
+        // 💡テスト用に、画面（menu.html）の ${loginUserName} に表示する仮の名前をセットします
+        model.addAttribute("loginUserName", "テストユーザー");
+
+        return "menu"; // templates/menu.html を呼び出す
     }
 
+    // ログインボタン（POST）を受け取る窓口
+    @PostMapping("/login") // 👈 ここが @PostMapping になっていますか？
+    public String loginTest(Model model) {
+        model.addAttribute("loginUserName", "山田 太郎（テストログイン）");
+        return "menu";
+    }
+
+    // 💡 1. ブラウザで /login と打ち込んだときに、ログイン画面を表示する窓口（今回追加）
+    @GetMapping("/login")
+    public String showLoginPage() {
+        return "login"; // src/main/resources/templates/login.html を呼び出す
+    }
 }
