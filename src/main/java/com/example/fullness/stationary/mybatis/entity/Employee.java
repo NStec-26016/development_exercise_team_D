@@ -5,12 +5,15 @@ import java.io.Serializable;
 import lombok.Data;
 
 @Data
-public class EmployeeAccount implements Serializable{
+public class Employee implements Serializable{
+
     private Integer id;
 
-    private Integer employeeId;
+    private Integer departmentId;
 
     private String name;
+
+    private String nameKana;
 
     private String password;
 }
