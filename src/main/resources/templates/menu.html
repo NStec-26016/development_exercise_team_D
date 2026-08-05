@@ -1,0 +1,254 @@
+<!--
+/**
+ * 画面名：メニュー
+ * 
+ * <p>システムの主軸となるメニュー画面を提供します。
+ * 本画面は、ユーザーのログイン状態（認証状態）に応じてヘッダーおよびフッターの表示項目を動的に切り替えます。</p>
+ * 
+ * <h2>項目定義一覧</h2>
+ * <h3>ヘッダー</h3>
+ * <ul>
+ *   <li>1 IO : サイト名 (参照名: title, 形式: text, 型: 文字列, 初期値: 「Team_D文具管理画面」) ※常時表示</li>
+ *   <li>2 I  : 商品情報メンテナンスリンク (参照名: productLink, 形式: link, 型: 文字列) ※ログイン後のみ</li>
+ *   <li>3 I  : 商品カテゴリ登録リンク (参照名: categoryAddLink, 形式: link, 型: 文字列) ※ログイン後のみ</li>
+ *   <li>4 I  : 購入履歴検索リンク (参照名: historySearchLink, 形式: link, 型: 文字列) ※ログイン後のみ</li>
+ *   <li>5 I  : アカウント登録リンク (参照名: empAddLink, 形式: link, 型: 文字列) ※ログイン後のみ</li>
+ *   <li>6 I  : ログインリンク (参照名: loginLink, 形式: link, 型: 文字列, 初期値: 「ログイン」) ※ログイン前のみ</li>
+ *   <li>7 I  : ログアウトリンク (参照名: logoutLink, 形式: button, 型: 文字列, 初期値: 「ログアウト」) ※ログイン後のみ</li>
+ * </ul>
+ * 
+ * <h3>メインコンテンツ</h3>
+ * <ul>
+ *   <li>O    : タイトル (参照名: title, 形式: text, 型: 文字列, 初期値: 「メニュー」)</li>
+ *   <li>O    : ウェルカム画像 (参照名: welcomeImage, 形式: image, 初期値: 「ようこそ、{担当者名}さん」) ※ログイン後のみ</li>
+ * </ul>
+ * 
+ * <h3>フッター</h3>
+ * <ul>
+ *   <li>1 O  : サイト名見出し (参照名: footerTitle, 形式: text, 型: 文字列, 初期値: 「Team＿D文具」)</li>
+ *   <li>2 I  : トップリンク (参照名: topLink, 形式: link, 型: 文字列)</li>
+ *   <li>5 I  : 商品検索リンク (参照名: productSearchLink, 形式: link, 型: 文字列) ※ログイン後のみ</li>
+ *   <li>6 I  : 買い物カゴリンク (参照名: cartLink, 形式: link, 型: 文字列) ※ログイン後のみ</li>
+ *   <li>7 I  : 購入履歴リンク (参照名: historyLink, 形式: link, 型: 文字列) ※ログイン後のみ</li>
+ *   <li>8 I  : ログアウトリンク (参照名: logoutLink, 形式: button, 型: 文字列, 初期値: 「ログアウト（○○さん）」) ※ログイン後のみ</li>
+ *   <li>9 O  : コピーライト (参照名: copyright, 形式: text, 型: 文字列, 初期値: 「Team＿D」)</li>
+ * </ul>
+ * 
+ * <h2>表示・レイアウト制御仕様</h2>
+ * <ul>
+ *   <li>ヘッダーおよびメインコンテンツは「中央揃え」とする。</li>
+ *   <li>フッターの項目1（サイト名見出し）および項目2〜8（ナビゲーションリンク）はすべて「左揃え」とし、項目2〜8は1つ1つ縦に改行して配置する。</li>
+ *   <li>項目9（コピーライト）のみフッターの最下部中央に「中央揃え」で配置する。</li>
+ *   <li>フッター全体の文字サイズは、ヘッダーおよびメインよりも小さなサイズ（13px）で統一する。</li>
+ *   <li>ヘッダーおよびフッターには、全体を区切るための緑色の直線（2px）を配置する。</li>
+ * </ul>
+ * 
+ * @author Team_D 深堀
+ */
+-->
+<!DOCTYPE html>
+<html xmlns:th="http://thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <title th:text="'メニュー'">メニュー</title>
+    <style>
+        header {
+            padding: 15px;
+            text-align: center;
+            border-bottom: 2px solid #008000;
+            color: #008000;
+        }
+
+        .site-title {
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 15px;
+            color: #008000;
+        }
+
+        nav {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 20px;
+        }
+
+        nav a {
+            text-decoration: none;
+            color: #008000;
+            font-weight: bold;
+        }
+
+        nav a:hover {
+            text-decoration: underline;
+        }
+
+        .logout-form {
+            display: inline;
+        }
+
+        .logout-btn {
+            background: none;
+            border: 2px solid #008000;
+            color: #008000;
+            cursor: pointer;
+            font-size: 16px;
+            padding: 5px 15px;
+            font-weight: bold;
+            border-radius: 4px;
+        }
+
+        .logout-btn:hover {
+            background-color: #e6f2e6;
+        }
+
+        .main-content {
+            padding: 30px;
+            text-align: center;
+            min-height: 200px;
+        }
+
+        .welcome-area {
+            margin-top: 20px;
+            font-size: 1.2em;
+            font-weight: bold;
+        }
+
+        .welcome-image-container {
+            margin-top: 20px;
+            display: block;
+            text-align: center;
+        }
+
+        .welcome-image-container img {
+            max-width: 300px;
+            height: auto;
+        }
+
+        footer {
+            margin-top: 50px;
+            padding: 20px;
+            border-top: 2px solid #008000;
+            color: #008000;
+            font-size: 13px;
+        }
+
+        .footer-left-align {
+            text-align: left;
+            margin-bottom: 20px;
+        }
+
+        .footer-title {
+            font-size: 15px;
+            font-weight: bold;
+            margin-bottom: 15px;
+        }
+
+        .footer-nav {
+            display: block;
+        }
+
+        .footer-nav-item {
+            margin-bottom: 10px;
+            display: block;
+        }
+
+        .footer-nav a {
+            text-decoration: none;
+            color: #008000;
+            font-weight: bold;
+        }
+
+        .footer-nav a:hover {
+            text-decoration: underline;
+        }
+
+        .footer-logout-btn {
+            background: none;
+            border: none;
+            color: #008000;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: bold;
+            padding: 0;
+            text-decoration: underline;
+        }
+
+        .copyright {
+            text-align: center;
+            font-size: 12px;
+            margin-top: 15px;
+            color: #008000;
+            border-top: 1px dashed #e6f2e6;
+            padding-top: 10px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <header>
+        <div class="site-title" th:text="'Team_D文具管理画面'">Team_D文具管理画面</div>
+        <nav>
+            <th:block th:if="${loginUserName == null}">
+                <a th:href="@{/login}" th:text="'ログイン'">ログイン</a>
+            </th:block>
+            <th:block th:if="${loginUserName != null}">
+                <a th:href="@{/product/maintenance}" th:text="'商品情報メンテナンス'">商品情報メンテナンス</a>
+                <a th:href="@{/category/add}" th:text="'商品カテゴリ登録'">商品カテゴリ登録</a>
+                <a th:href="@{/history/search}" th:text="'購入履歴検索'">購入履歴検索</a>
+                <a th:href="@{/employee/add}" th:text="'アカウント登録'">アカウント登録</a>
+                <form th:action="@{/logout}" method="post" class="logout-form">
+                    <button type="submit" class="logout-btn" th:text="'ログアウト'">ログアウト</button>
+                </form>
+            </th:block>
+        </nav>
+    </header>
+
+    <div class="main-content">
+        <h1 th:text="'メニュー'">メニュー</h1>
+
+        <div class="welcome-area" th:if="${loginUserName != null}">
+            <p th:text="'ようこそ、' + ${loginUserName} + 'さん'">ようこそ、ユーザーさん</p>
+            <div class="welcome-image-container">
+                <img th:src="@{/images/Shop_Img1.jpeg}" alt="ウェルカム画像" />
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <div class="footer-left-align">
+            <div class="footer-title" th:text="'Team＿D文具'">Team＿D文具</div>
+
+            <div class="footer-nav">
+                <div class="footer-nav-item">
+                    <a th:href="@{/menu}" th:text="'トップ'">トップ</a>
+                </div>
+
+                <th:block th:if="${loginUserName != null}">
+                    <div class="footer-nav-item">
+                        <a th:href="@{/product/search}" th:text="'商品検索'">商品検索</a>
+                    </div>
+                    <div class="footer-nav-item">
+                        <a th:href="@{/cart}" th:text="'買い物カゴ'">買い物カゴ</a>
+                    </div>
+                    <div class="footer-nav-item">
+                        <a th:href="@{/history}" th:text="'購入履歴'">購入履歴</a>
+                    </div>
+                    <div class="footer-nav-item">
+                        <form th:action="@{/logout}" method="post" class="logout-form">
+                            <button type="submit" class="footer-logout-btn" th:text="'ログアウト（' + ${loginUserName} + '）'">
+                                ログアウト（〇〇さん）
+                            </button>
+                        </form>
+                    </div>
+                </th:block>
+            </div>
+        </div>
+        <div class="copyright" th:text="'&copy; Team＿D'">Team＿D</div>
+    </footer>
+
+</body>
+
+</html>
