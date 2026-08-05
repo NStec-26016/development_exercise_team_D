@@ -3,6 +3,8 @@ package com.example.fullness.stationary.mybatis.service;
 import com.example.fullness.stationary.mybatis.entity.EmployeeAccount;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.stereotype.Service;
+
 import java.util.Collection;
 
 /**
