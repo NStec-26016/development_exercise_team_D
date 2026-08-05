@@ -15,6 +15,7 @@ import java.util.Collection;
  * @author YourName
  * @version 1.0
  */
+@Service
 public class EmployeeAccountDetails implements UserDetails {
 
     /** 従業員アカウントのエンティティ情報 */

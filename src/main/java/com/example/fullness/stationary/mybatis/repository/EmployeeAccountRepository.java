@@ -1,17 +1,19 @@
 package com.example.fullness.stationary.mybatis.repository;
 
-import com.example.fullness.stationary.mybatis.entity.Employee;
+import org.apache.ibatis.annotations.Mapper;
+import org.springframework.data.repository.query.Param;
+import org.springframework.stereotype.Repository;
 
-// @Data
-public class EmployeeAccountRepository {
+import com.example.fullness.stationary.mybatis.entity.EmployeeAccount;
 
-    private String userName;
+@Mapper
+@Repository
 
-    private String password;
+public interface EmployeeAccountRepository {
+    // UC17 担当者ログイン
+    EmployeeAccount findByName(@Param("name") String name);
 
-    public Employee findByAcountName(String username2) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'findByAcountName'");
-    }
-
+    // UC09 担当者アカウント登録
+    int insertEmployeeAccount(EmployeeAccount employeeAccount);
 }
+
