@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?> 
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.fullness.stationary.mybatis.repository.EmployeeAccountRepository">
+ <resultMap id="EmployeeAccountResult" type="EmployeeAccount"> 
+        <id property="id" column="employe_account_id" /> 
+        <result property="employeeId" column="employee_id" /> 
+        <result property="name" column="name" /> 
+        <result property="password" column="password"/>
+
+         <association property="employee" javaType="Employee">
+        <id property="emoloyeeId" column="employee_id" />
+        <result property="departmentId" column="department_id" />
+        <result property="name" column="name" />
+        <result property="nameKana" column="name_kana" />
+
+         <association property="department" javaType="Department">
+            <id property="departmentId" column="department_id" />
+            <result property="name" column="name" />
+        </association>
+    </association>
+</resultMap>
+
+ <select id="findByUsername" resultMap="EmployeeAccountResult"> 
+    <![CDATA[ 
+        SELECT 
+        a.employee_account_id,
+        a.employee_id,
+        a.name,
+        a.password,
+        
+        e.employee_id AS employeeId,
+        e.department_id AS deptmentId,         
+        e.name AS name,    
+        e.kana AS kana,    
+
+        d.department_id AS departmentId,      
+        d.name AS name
+
+        FROM EmployeeAccount a 
+
+    JOIN employee e ON a.employee_no = e.employee_no 
+    JOIN department d ON e.department_id = d.department_id 
+    WHERE a.name = #{name} 
+    ]]>
+     </select>
+    
+     <insert id="insertEmployeeAccount" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO employee_account (employee_id, name, password) 
+        VALUES (#{employeeId}, #{name}, #{password})
+    </insert> 
+</mapper> 
