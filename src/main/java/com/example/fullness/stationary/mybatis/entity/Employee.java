@@ -8,11 +8,12 @@ import lombok.Data;
 public class Employee implements Serializable{
 
     private Integer id;
-    
-    
+
     private Integer departmentId;
 
     private String name;
 
     private String nameKana;
+
+    private String password;
 }

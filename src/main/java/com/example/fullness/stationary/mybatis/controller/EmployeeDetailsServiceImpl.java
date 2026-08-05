@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 
 @Controller
-public class LoginController {
+class EmployeeDetailsServiceImpl {
     
     @Autowired
     // private LoginForm loginForm;
@@ -15,7 +15,7 @@ public class LoginController {
     /**ログイン画面を表示*/
     @GetMapping("/login")
     public String showLogin(Model model){
-        return null;
+        return "login";
     }
     
     

@@ -12,5 +12,5 @@ public class EmployeeAccount implements Serializable{
 
     private String name;
 
-    private Integer password;
+    private String password;
 }
