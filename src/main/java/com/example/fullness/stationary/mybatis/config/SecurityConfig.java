@@ -33,7 +33,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
      * .usernameParameter("username")      : フォームから送信されるユーザー名のname属性。
      * .passwordParameter("password")      : フォームから送信されるパスワードのname属性。
      * .defaultSuccessUrl("/menu", true)   : ログイン成功時のリダイレクト先（強制的に /menu へ遷移）。
-     * ailureUrl("/admin/login?error")   : ログイン失敗時のリダイレクト先。
+     * .failureUrl("/admin/login?error")   : ログイン失敗時のリダイレクト先。
      * 
      * ログアウト設定 (Logout)
      * .logoutUrl("/logout")         : ログアウト処理を実行するための内部エンドポイント（POST）。
