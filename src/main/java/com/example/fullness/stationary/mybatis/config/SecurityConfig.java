@@ -9,8 +9,14 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 /**
- * 認証・認可セキュリティ設定クラス
+ * 担当者がシステムにログイン・ログアウトする際の認証・認可設定クラス。
  * 
+ * 
+ * どのようなリクエストを受信したらログイン認証して欲しいのか。
+ * どのようなリクエストを受信したらログアウトして欲しいのか。
+ * どのようなリクエストの場合は認証チェックをしないかなど。
+ * 
+ *
  * @author 長田
  * @version 0.01
  */
@@ -19,67 +25,54 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 @Configuration
 public class SecurityConfig {
    /**
-    * セキュリティフィルターチェーンの設定
-    * HTTPリクエストに対するセキュリティポリシーを定義する
+    * 
     *
-    * アクセス権限 (Authorize)
-    * /admin/login : ログイン画面。全員アクセスを許可。
-    * /admin : 管理者メニュー画面。ログイン前後どちらの状態でも全員アクセスを許可。
-    * その他のURL : システム内のその他全画面（/menu等）。ログイン認証を必須とする。
-    * 
-    * ログイン設定 (FormLogin)
-    * .loginPage("/admin/login") : カスタムログイン画面を表示するためのURL。
-    * .loginProcessingUrl("/admin/login") : ログイン認証を処理する内部エンドポイント（POST）。
-    * .usernameParameter("username") : フォームから送信されるユーザー名のname属性。
-    * .passwordParameter("password") : フォームから送信されるパスワードのname属性。
-    * .defaultSuccessUrl("/menu", true) : ログイン成功時のリダイレクト先（強制的に /menu へ遷移）。
-    * .failureUrl("/admin/login?error") : ログイン失敗時のリダイレクト先。
-    * 
-    * ログアウト設定 (Logout)
-    * .logoutUrl("/logout") : ログアウト処理を実行するための内部エンドポイント（POST）。
-    * .logoutSuccessUrl("/admin") : ログアウト完了後のリダイレクト先（ログイン前のメニュー画面に戻す）。
-    * .invalidateHttpSession(true) : サーバー側のHTTPセッションを完全に破棄。
-    * .deleteCookies("JSESSIONID") : クライアント側のセッションクッキーを削除。
-    * .clearAuthentication(true) : 認証情報（ユーザー情報）を完全にクリア。
-    * 
-    * @param http HTTPリクエストのセキュリティ構成を構築するオブジェクト
-    * @return 構築された SecurityFilterChain オブジェクト
-    * @throws Exception セキュリティ設定構築中にエラーが発生した場合
+    * @param http セキュリティポリシーを定義・構築するための構成オブジェクト。nullは指定できません。
+    * @return 認可・ログイン・ログアウトの連動機能が統合された、システム全体の防御フィルター。
+    * @throws Exception 定義したセキュリティ要件（ログイン制限やパスの設定など）に矛盾や不正な不整合が検出された場合。
     */
 
    @Bean
    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+
+      /*
+       * 【未ログイン状態でもアクセスできる画面設定の実現】
+       * 
+       * 担当者ログイン用URL（/admin/login）およびメニュー画面（/admin）は誰でもアクセスできるようにし、
+       * それ以外のページはすべてログイン必須（認証が必要）に制限します
+       */
       http.authorizeHttpRequests(authz -> authz
             .requestMatchers("/admin/login").permitAll()
             .requestMatchers("/admin").permitAll()
             .anyRequest().authenticated())
+            /*
+             * 【ログインの実現】
+             * 
+             * 専用のログインフォームを通じてユーザーを識別し、認証成功時はメニュー画面へ遷移させます。
+             * 認証に失敗した場合は、ログイン画面に留まらせ、不正な侵入を防止します。
+             */
+
             .formLogin(login -> login
-                  // ログイン認証画面を出力するURLパスを表す
                   .loginPage("/admin/login")
-                  // 指定されたURL パスの場合ログイン認証することを表す
                   .loginProcessingUrl("/admin/login")
-                  // ユーザ名とパスワードのリクエストパラメータ名を表す
                   .usernameParameter("name")
                   .passwordParameter("password")
-                  // 認証が成功した場合にリダイレクトするURLパスを指定する。2番目の引数にはログインが成功したら必ず指定された
-                  // パスに遷移させたい場合true を指定する
                   .defaultSuccessUrl("/menu", true)
-                  // ログイン認証に失敗した場合に遷移するURLパスを表す
                   .failureUrl("/admin/login?error")
-                  // ログイン認証の動作はいつでも許可することを表す
                   .permitAll())
+
+            /*
+             * 【ログアウトの実現】
+             * 
+             * ユーザーが利用を終了した際、サーバー側の通信状態（セッション）を即座に破棄し、ブラウザに残る識別情報（Cookie）や認証用キャッシュを完全に消去します。
+             * 
+             */
             .logout(logout -> logout
-                  // 引数のURL パスの場合にログアウト処理することを表す
                   .logoutUrl("/logout")
-                  // ログアウト処理が成功した場合の遷移先パスを表す
                   .logoutSuccessUrl("/admin")
-                  // セッションを破棄することを表す
                   .invalidateHttpSession(true)
-                  // 引数で指定された名称でCookie に保存されている値を破棄する
                   .deleteCookies("JSESSIONID")
-                  // 認証情報をクリアすることを表す
                   .clearAuthentication(true)
-                  // ログアウト処理は全員アクセス可能
                   .permitAll());
 
       return http.build();
@@ -87,10 +80,13 @@ public class SecurityConfig {
    }
 
    /**
-    * パスワード暗号化（ハッシュ化）の仕組みを定義する
-    * ユーザーのパスワードを管理・照合する
+    * 【ユーザーの生パスワード解読防止を実現。】
     * 
-    * @return システム全体で使用する PasswordEncoder（BCrypt形式）のオブジェクト
+    * ハッシュ化技術をシステムに導入する。
+    * これにより、開発者やシステム管理者であってもユーザーの生パスワードを閲覧することが不可能になる。
+    * 結果として、悪意ある第三者による攻撃からユーザーのアカウント情報を保護する。
+    * 
+    * @return 安全にパスワードを保管・照合するための暗号化エンジン。システム内での登録・認証処理で共通して利用されます。
     */
 
    @Bean
