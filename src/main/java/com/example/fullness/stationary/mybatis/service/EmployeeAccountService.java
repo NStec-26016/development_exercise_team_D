@@ -22,11 +22,11 @@ public class EmployeeAccountService {
 
     /** 従業員アカウントのデータアクセスを行うリポジトリ */
     @Autowired
-    private EmployeeAccountRepository employeeAccountRepository; 
+    private EmployeeAccountRepository employeeAccountRepository;
 
     /** パスワードを安全に暗号化（ハッシュ化）するためのエンコーダー */
     @Autowired
-    private PasswordEncoder passwordEncoder;  
+    private PasswordEncoder passwordEncoder;
 
     /**
      * 新しい従業員アカウントをデータベースに登録します。
@@ -38,15 +38,15 @@ public class EmployeeAccountService {
      * 
      * @param employeeAccount 登録する従業員アカウントのエンティティ情報（生のパスワードを含む）
      */
-    @Transactional 
-    public void create(EmployeeAccount employeeAccount) { 
+    @Transactional
+    public void create(EmployeeAccount employeeAccount) {
         // 1. 従業員アカウントから生のパスワードを取得
-        String password = employeeAccount.getPassword(); 
-        
+        String password = employeeAccount.getPassword();
+
         // 2. パスワードをハッシュ化して、従業員アカウントにセットし直す
-        employeeAccount.setPassword(passwordEncoder.encode(password)); 
-        
+        employeeAccount.setPassword(passwordEncoder.encode(password));
+
         // 3. リポジトリを呼び出してデータベースに保存
-        employeeAccountRepository.insertEmployeeAccount(employeeAccount); 
-    } 
+        employeeAccountRepository.insertEmployeeAccount(employeeAccount);
+    }
 }

@@ -43,9 +43,9 @@ public class EmployeeAccountDetailsService implements UserDetailsService {
         if (employeeAccount == null) {
             throw new UsernameNotFoundException("user not found.");
         }
-        Collection<GrantedAuthority> authorites = getAuthorits(employeeAccount); 
-        return new EmployeeAccountDetails(employeeAccount, authorites); 
-    } 
+        Collection<GrantedAuthority> authorites = getAuthorits(employeeAccount);
+        return new EmployeeAccountDetails(employeeAccount, authorites);
+    }
 
     /**
      * 従業員アカウントの役割（ロール）文字列を基に、Spring Security用の権限コレクションを生成します。
@@ -57,11 +57,11 @@ public class EmployeeAccountDetailsService implements UserDetailsService {
      * @param employeeAccount 権限を判定する従業員アカウント情報
      * @return 付与された {@link GrantedAuthority} オブジェクトのコレクション
      */
-    private Collection<GrantedAuthority> getAuthorits(EmployeeAccount employeeAccount) { 
+    private Collection<GrantedAuthority> getAuthorits(EmployeeAccount employeeAccount) {
         // 文字列の取得メソッド名が getEmployeeAccountRole() の場合
         String role = employeeAccount.getEmployeeAccountRole();
 
         // 文字列の比較は .equals() を使います
-            return AuthorityUtils.createAuthorityList("Admin");  
+        return AuthorityUtils.createAuthorityList("Admin");
     }
 }
