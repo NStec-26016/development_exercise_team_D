@@ -8,45 +8,44 @@ import com.example.fullness.stationary.mybatis.entity.EmployeeAccount;
 import com.example.fullness.stationary.mybatis.repository.EmployeeAccountRepository;
 
 /**
- * 従業員アカウントの業務ロジックを管理するサービス実装クラス。
- * <p>
- * アカウント情報の新規登録時に、セキュリティ向上のためのパスワードハッシュ化や
- * トランザクション管理を伴うデータベースへの保存処理を提供します。
- * </p>
+ * 従業員アカウントの新規登録処理を行うサービス（クラス）です。
  * 
- * @author YourName
+ * ユーザー登録画面から送られてきたアカウント情報をデータベースに保存する処理を担当します。
+ * セキュリティを高くするためにパスワードを暗号化（ハッシュ化）する処理や、
+ * 「データの不整合を防ぐためのトランザクション管理（@Transactional）」を取り入れています。
+ * 
+ * @author マルモト
  * @version 1.0
  */
 @Service
 public class EmployeeAccountService {
 
-    /** 従業員アカウントのデータアクセスを行うリポジトリ */
+    /** データベースへデータを保存するために、リポジトリクラスをインジェクション（DI）しています */
     @Autowired
     private EmployeeAccountRepository employeeAccountRepository;
 
-    /** パスワードを安全に暗号化（ハッシュ化）するためのエンコーダー */
+    /** パスワードを安全に暗号化（ハッシュ化）するための暗号化エンジン（エンコーダー）です */
     @Autowired
     private PasswordEncoder passwordEncoder;
 
     /**
-     * 新しい従業員アカウントをデータベースに登録します。
-     * <p>
-     * 画面から入力された生のパスワードを {@link PasswordEncoder} を用いてハッシュ化し、
-     * 安全な状態に上書きした上でリポジトリを経由してデータベースへ保存します。
-     * このメソッドはトランザクション管理下で実行されます。
-     * </p>
+     * 新しい従業員アカウントをデータベースに登録（保存）するメソッドです。
      * 
-     * @param employeeAccount 登録する従業員アカウントのエンティティ情報（生のパスワードを含む）
+     * 画面から入力された生のパスワードをそのまま保存すると危険なので、
+     * PasswordEncoder を使って暗号化された文字に変換してから、リポジトリ経由でDBへ保存します。
+     * 万が一、途中でエラーが起きてもデータが中途半端に残らないように、@Transactional をつけています。
+     * 
+     * @param employeeAccount 画面から入力されたデータが入っている従業員アカウントのエンティティ
      */
     @Transactional
     public void create(EmployeeAccount employeeAccount) {
-        // 1. 従業員アカウントから生のパスワードを取得
+        // 1. 従業員アカウントのデータから、画面に入力された生のパスワードを取り出します
         String password = employeeAccount.getPassword();
 
-        // 2. パスワードをハッシュ化して、従業員アカウントにセットし直す
+        // 2. 取り出したパスワードを暗号化（ハッシュ化）して、元のデータにセットし直します
         employeeAccount.setPassword(passwordEncoder.encode(password));
 
-        // 3. リポジトリを呼び出してデータベースに保存
+        // 3. リポジトリのメソッドを呼び出して、データベースに新しくデータを追加（インサート）します
         employeeAccountRepository.insertEmployeeAccount(employeeAccount);
     }
 }
