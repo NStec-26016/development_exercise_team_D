@@ -12,7 +12,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
  * 認証・認可セキュリティ設定クラス
  * 
  * @author 長田
- * 
+ * @version 0.01
  */
 
 @EnableWebSecurity

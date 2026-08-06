@@ -13,4 +13,6 @@ public class EmployeeAccount implements Serializable{
     private String name;
 
     private String password;
+
+    private String employeeAccountRole; 
 }

@@ -3,6 +3,8 @@ package com.example.fullness.stationary.mybatis.service;
 import com.example.fullness.stationary.mybatis.entity.EmployeeAccount;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.stereotype.Service;
+
 import java.util.Collection;
 
 /**
@@ -27,9 +29,9 @@ public class EmployeeAccountDetails implements UserDetails {
      * 指定された従業員アカウントと権限情報を使用して、新しいオブジェクトを構築します。
      * 
      * @param employeeAccount 従業員アカウントのエンティティ
-     * @param authorites ユーザーに付与する権限情報のコレクション
+     * @param authorites      ユーザーに付与する権限情報のコレクション
      */
-    public EmployeeAccountDetails(EmployeeAccount employeeAccount, Collection<GrantedAuthority> authorites){
+    public EmployeeAccountDetails(EmployeeAccount employeeAccount, Collection<GrantedAuthority> authorites) {
         this.employeeAccount = employeeAccount;
         this.authorites = authorites;
     }
