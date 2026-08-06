@@ -4,7 +4,7 @@
 <mapper namespace="com.example.fullness.stationary.mybatis.repository.EmployeeAccountRepository">
 <!-- 【UC17 担当者ログイン用】アカウント単体（パスワード照合用）のマッピング -->
  <resultMap id="EmployeeAccountResult" type="EmployeeAccount"> 
-        <id property="id" column="employee_account_id" /> 
+        <id property="id" column="id" /> 
         <result property="employeeId" column="employee_id" /> 
         <result property="name" column="name" /> 
         <result property="password" column="password"/>
@@ -13,7 +13,7 @@
 <!-- 【UC17 担当者ログイン】アカウント名からパスワード照合のために1件取得する -->
 <select id="findByName" resultMap="EmployeeAccountResult"> 
         SELECT 
-            employee_account_id,
+            id,
             employee_id,
             name,
             password

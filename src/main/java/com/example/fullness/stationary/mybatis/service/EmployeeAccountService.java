@@ -13,7 +13,7 @@ import com.example.fullness.stationary.mybatis.repository.EmployeeAccountReposit
  * アカウント情報の新規登録時に、セキュリティ向上のためのパスワードハッシュ化や
  * トランザクション管理を伴うデータベースへの保存処理を提供します。
  * </p>
- * 
+ *
  * @author YourName
  * @version 1.0
  */
@@ -35,7 +35,7 @@ public class EmployeeAccountService {
      * 安全な状態に上書きした上でリポジトリを経由してデータベースへ保存します。
      * このメソッドはトランザクション管理下で実行されます。
      * </p>
-     * 
+     *
      * @param employeeAccount 登録する従業員アカウントのエンティティ情報（生のパスワードを含む）
      */
     @Transactional

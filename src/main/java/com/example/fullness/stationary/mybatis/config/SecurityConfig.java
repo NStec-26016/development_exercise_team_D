@@ -50,8 +50,7 @@ public class SecurityConfig {
    @Bean
    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
       http.authorizeHttpRequests(authz -> authz
-            .requestMatchers("/admin/login").permitAll()
-            .requestMatchers("/admin").permitAll()
+            .requestMatchers("/", "/admin", "/admin/login").permitAll()
             .anyRequest().authenticated())
             .formLogin(login -> login
                   // ログイン認証画面を出力するURLパスを表す
