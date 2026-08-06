@@ -9,12 +9,9 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 /**
- * 担当者がシステムにログイン・ログアウトする際の認証・認可設定クラス。
+ * SpringSecurityフレームワークを用いたセキュリティの設定のクラス
  * 
  * 
- * どのようなリクエストを受信したらログイン認証して欲しいのか。
- * どのようなリクエストを受信したらログアウトして欲しいのか。
- * どのようなリクエストの場合は認証チェックをしないかなど。
  * 
  *
  * @author 長田
@@ -25,13 +22,13 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 @Configuration
 public class SecurityConfig {
    /**
-    * 
+    * 【システムのセキュリティ制御およびアクセス権限の集中管理を実現。】
+    * アプリケーション全体のHTTPリクエストに対する認証・認可ルール、ログイン・ログアウト挙動を一元的に定義する。
     *
     * @param http セキュリティポリシーを定義・構築するための構成オブジェクト。nullは指定できません。
     * @return 認可・ログイン・ログアウトの連動機能が統合された、システム全体の防御フィルター。
     * @throws Exception 定義したセキュリティ要件（ログイン制限やパスの設定など）に矛盾や不正な不整合が検出された場合。
     */
-
    @Bean
    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 
@@ -80,15 +77,13 @@ public class SecurityConfig {
    }
 
    /**
-    * 【ユーザーの生パスワード解読防止を実現。】
-    * 
+    * 【ユーザーの生パスワードが解読防止を実現。】
     * ハッシュ化技術をシステムに導入する。
     * これにより、開発者やシステム管理者であってもユーザーの生パスワードを閲覧することが不可能になる。
     * 結果として、悪意ある第三者による攻撃からユーザーのアカウント情報を保護する。
     * 
     * @return 安全にパスワードを保管・照合するための暗号化エンジン。システム内での登録・認証処理で共通して利用されます。
     */
-
    @Bean
    public PasswordEncoder passwordEncoder() {
       return new BCryptPasswordEncoder();
