@@ -21,7 +21,7 @@ public class LoginController {
     /**
      * ログイン画面を表示します。
      * <p>
-     * URL「/login」へのGETリクエストに対して、ログイン用HTML（templates/login.html）を返却します。
+     * URL「/admin/login」へのGETリクエストに対して、ログイン用HTML（templates/login.html）を返却します。
      * </p>
      *
      * @return ログイン画面のビュー名 "login"
@@ -34,7 +34,7 @@ public class LoginController {
     /**
      * メニュー画面を表示します。
      * <p>
-     * URL「/menu」へのGETリクエストを処理します。
+     * URL「/admin」へのGETリクエストを処理します。
      * Spring Securityのコンテキストから現在ログイン中の認証情報を取得し、
      * ログイン済みであればユーザー名を画面（Model）に設定します。
      * 未ログインの場合は、ユーザー名を設定せずに画面を表示します。
@@ -51,7 +51,7 @@ public class LoginController {
         if (authentication != null && authentication.isAuthenticated()
                 && !"anonymousUser".equals(authentication.getName())) {
             String loginUserName = authentication.getName();
-            model.addAttribute("loginUserName", loginUserName);
+            model.addAttribute("name", loginUserName);
         }
 
         return "menu";
