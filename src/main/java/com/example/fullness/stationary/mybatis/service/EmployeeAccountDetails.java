@@ -13,7 +13,7 @@ import java.util.Collection;
  * Spring Securityがログイン処理で使えるようにするために作成しました。
  * 一度セットしたデータが変わらないように final をつけています。
  * 
- * @author YourName
+ * @author 丸本
  * @version 1.0
  */
 public class EmployeeAccountDetails implements UserDetails {
@@ -81,7 +81,7 @@ public class EmployeeAccountDetails implements UserDetails {
     /**
      * アカウントの有効期限が切れていないかをチェックするメソッドです。
      * 
-     * 今回の開発（v1.0）では有効期限の機能は使わないため、
+     * 今回の開発では有効期限の機能は使わないため、
      * 常に「期限内である」という意味の true を返しています。
      * 
      * @return 常に true （有効期限切れではない）
