@@ -47,6 +47,6 @@ public class EmployeeAccountService {
         employeeAccount.setPassword(passwordEncoder.encode(password));
 
         // 3. リポジトリを呼び出してデータベースに保存
-        employeeAccountRepository.insertEmployeeAccount(employeeAccount);
+        // employeeAccountRepository.insertEmployeeAccount(employeeAccount);
     }
 }

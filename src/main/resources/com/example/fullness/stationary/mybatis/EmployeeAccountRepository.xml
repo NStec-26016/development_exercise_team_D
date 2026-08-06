@@ -2,53 +2,22 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
 "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.example.fullness.stationary.mybatis.repository.EmployeeAccountRepository">
-<!-- アカウント自体の基本情報 -->
+<!-- 【UC17 担当者ログイン用】アカウント単体（パスワード照合用）のマッピング -->
  <resultMap id="EmployeeAccountResult" type="EmployeeAccount"> 
-        <id property="id" column="employe_account_id" /> 
+        <id property="id" column="employee_account_id" /> 
         <result property="employeeId" column="employee_id" /> 
         <result property="name" column="name" /> 
         <result property="password" column="password"/>
-<!-- 紐づく親情報その1：社員テーブル (1対1) -->
-         <association property="employee" javaType="Employee">
-        <id property="emoloyeeId" column="employee_id" />
-        <result property="departmentId" column="department_id" />
-        <result property="name" column="name" />
-        <result property="nameKana" column="name_kana" />
-<!-- 紐づく親情報その2：さらにその親の部署テーブル (1対1の入れ子構造) -->
-         <association property="department" javaType="Department">
-            <id property="departmentId" column="department_id" />
-            <result property="name" column="name" />
-        </association>
-    </association>
-</resultMap>
-<!-- 【UC17 担当者ログイン】ユーザー名をもとにアカウント情報を検索する -->
- <select id="findByUsername" resultMap="EmployeeAccountResult"> 
-    <![CDATA[ 
+        </resultMap>
+
+<!-- 【UC17 担当者ログイン】アカウント名からパスワード照合のために1件取得する -->
+<select id="findByName" resultMap="EmployeeAccountResult"> 
         SELECT 
-        a.employee_account_id,
-        a.employee_id,
-        a.name,
-        a.password,
-        
-        e.employee_id AS employeeId,
-        e.department_id AS deptmentId,         
-        e.name AS name,    
-        e.kana AS kana,    
-
-        d.department_id AS departmentId,      
-        d.name AS name
-
-        FROM EmployeeAccount a  <!-- アカウントに社員を紐付け（主キー: 社員番号）-->
-
-    JOIN employee e ON a.employee_no = e.employee_no  -- 社員に部署を紐付け（外部キー: 部署ID）--
-    JOIN department d ON e.department_id = d.department_id 
-    WHERE a.name = #{name} 
-    ]]>
-     </select>
-    
-     <!-- 【UC09 担当者アカウント登録】新しいログイン情報を追加する -->
-     <insert id="insertEmployeeAccount" useGeneratedKeys="true" keyProperty="id">
-        INSERT INTO employee_account (employee_id, name, password) 
-        VALUES (#{employeeId}, #{name}, #{password})
-    </insert> 
-</mapper> 
+            employee_account_id,
+            employee_id,
+            name,
+            password
+        FROM employee_account
+        WHERE name = #{name} 
+    </select>
+    </mapper>

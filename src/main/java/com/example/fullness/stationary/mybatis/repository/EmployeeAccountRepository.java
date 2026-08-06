@@ -26,6 +26,6 @@ public interface EmployeeAccountRepository {
      */
     EmployeeAccount findByName(@Param("name") String name);
 
-    // UC09 担当者アカウント登録
-    int insertEmployeeAccount(EmployeeAccount employeeAccount);
+    // // UC09 担当者アカウント登録
+    // int insertEmployeeAccount(EmployeeAccount employeeAccount);
 }

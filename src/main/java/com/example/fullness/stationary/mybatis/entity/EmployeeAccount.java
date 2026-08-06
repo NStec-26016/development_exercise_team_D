@@ -5,7 +5,7 @@ import java.io.Serializable;
 import lombok.Data;
 
 @Data
-public class EmployeeAccount implements Serializable{
+public class EmployeeAccount implements Serializable {
     private Integer id;
 
     private Integer employeeId;
@@ -14,5 +14,5 @@ public class EmployeeAccount implements Serializable{
 
     private String password;
 
-    private String employeeAccountRole; 
+    private String employeeAccountRole;
 }
