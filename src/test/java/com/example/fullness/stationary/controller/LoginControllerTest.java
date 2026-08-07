@@ -25,12 +25,17 @@ public class LoginControllerTest {
 
     @BeforeEach
     public void setUp() {
-        // ただし、Thymeleafの読み込みエラーと無限ループを防ぐ解決器（viewResolver）だけを安全に挟み込みます。
-        InternalResourceViewResolver viewResolver = new InternalResourceViewResolver();
-        viewResolver.setPrefix("");
-        viewResolver.setSuffix("");
 
-        mockMvc = MockMvcBuilders.standaloneSetup(loginController)
+        org.springframework.web.servlet.view.InternalResourceViewResolver viewResolver = new org.springframework.web.servlet.view.InternalResourceViewResolver();
+
+        // 1. 画面の場所をダミーの文字列で指定
+        viewResolver.setPrefix("/WEB-INF/views/");
+        viewResolver.setSuffix(".html");
+
+        viewResolver.setAlwaysInclude(true);
+
+        mockMvc = org.springframework.test.web.servlet.setup.MockMvcBuilders
+                .standaloneSetup(loginController)
                 .setViewResolvers(viewResolver)
                 .build();
     }
