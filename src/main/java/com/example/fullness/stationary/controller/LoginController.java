@@ -27,8 +27,11 @@ public class LoginController {
      * @return ログイン画面のビュー名 "login"
      */
     @GetMapping("/admin/login")
-    public String showLoginPage() {
-        return "login";
+    public String showLoginPage(org.springframework.ui.Model model) {
+        model.addAttribute("errorMessage", "");
+        model.addAttribute("accountName", "");
+        // templates/admin/login.html を見に行かせます
+        return "admin/login";
     }
 
     /**
@@ -54,6 +57,6 @@ public class LoginController {
             model.addAttribute("name", loginUserName);
         }
 
-        return "menu";
+        return "admin/menu";
     }
 }

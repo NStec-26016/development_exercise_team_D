@@ -2,16 +2,18 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
 "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.example.fullness.stationary.mybatis.repository.EmployeeAccountRepository">
-<!-- 【UC17 担当者ログイン用】アカウント単体（パスワード照合用）のマッピング -->
- <resultMap id="EmployeeAccountResult" type="EmployeeAccount"> 
+
+    <!-- 【UC17 担当者ログイン用】アカウント単体（パスワード照合用）のマッピング -->
+    <!-- ⬇️ 消えていた開始タグを正しく復活させました -->
+      <resultMap id="EmployeeAccountResult" type="EmployeeAccount">
         <id property="id" column="id" /> 
         <result property="employeeId" column="employee_id" /> 
         <result property="name" column="name" /> 
         <result property="password" column="password"/>
-        </resultMap>
+    </resultMap>
 
-<!-- 【UC17 担当者ログイン】アカウント名からパスワード照合のために1件取得する -->
-<select id="findByName" resultMap="EmployeeAccountResult"> 
+    <!-- 【UC17 担当者ログイン】アカウント名からパスワード照合のために1件取得する -->
+    <select id="findByName" resultMap="EmployeeAccountResult"> 
         SELECT 
             id,
             employee_id,
@@ -20,4 +22,5 @@
         FROM employee_account
         WHERE name = #{name} 
     </select>
-    </mapper>
+
+</mapper>

@@ -62,6 +62,6 @@ public class EmployeeAccountDetailsService implements UserDetailsService {
         String role = employeeAccount.getEmployeeAccountRole();
 
         // 文字列の比較は .equals() を使います
-        return AuthorityUtils.createAuthorityList("Admin");
+        return AuthorityUtils.createAuthorityList("ROLE_Admin");
     }
 }
