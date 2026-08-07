@@ -31,6 +31,7 @@ public class LoginController {
         model.addAttribute("errorMessage", "");
         model.addAttribute("accountName", "");
         // templates/admin/login.html を見に行かせます
+        model.addAttribute("loggedIn", false);
         return "admin/login";
     }
 
@@ -55,6 +56,11 @@ public class LoginController {
                 && !"anonymousUser".equals(authentication.getName())) {
             String loginUserName = authentication.getName();
             model.addAttribute("name", loginUserName);
+
+            model.addAttribute("loggedIn", true);
+        } else {
+            // ⭕ ログインしていないので、Thymeleafヘッダーに「false」を渡します
+            model.addAttribute("loggedIn", false);
         }
 
         return "admin/menu";

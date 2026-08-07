@@ -53,6 +53,8 @@ public class SecurityConfig {
       http.csrf(csrf -> csrf.disable());
       http.authorizeHttpRequests(authz -> authz
             .requestMatchers("/error").permitAll()
+            // ⬇️ ここにCSSなどの静的リソースを許可する設定を追加しました
+            .requestMatchers("/css/**", "/js/**", "/images/**").permitAll()
             .requestMatchers("/admin", "/admin/login").permitAll()
             .anyRequest().authenticated())
             .formLogin(login -> login
