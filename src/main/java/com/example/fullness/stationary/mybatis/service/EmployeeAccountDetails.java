@@ -3,33 +3,35 @@ package com.example.fullness.stationary.mybatis.service;
 import com.example.fullness.stationary.mybatis.entity.EmployeeAccount;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.stereotype.Service;
 
 import java.util.Collection;
 
 /**
- * Spring Security で利用する従業員アカウントの認証・認可詳細情報を保持するクラス。
- * <p>
- * データベースから取得した {@link EmployeeAccount} エンティティをラップし、
- * Spring Security が認証処理を行うために必要なユーザー情報を提供します。
- * </p>
+ * Spring Security用のユーザー情報を管理するクラスです。
  * 
- * @author YourName
+ * データベースから取得した従業員アカウントの情報（EmployeeAccount）を、
+ * Spring Securityがログイン処理で使えるようにするために作成しました。
+ * 一度セットしたデータが変わらないように final をつけています。
+ * 
+ * @author 丸本
  * @version 1.0
  */
 public class EmployeeAccountDetails implements UserDetails {
 
-    /** 従業員アカウントのエンティティ情報 */
+    /** データベースから持ってきた従業員アカウントの情報です */
     private final EmployeeAccount employeeAccount;
 
-    /** ユーザーに付与された権限（ロール等）のコレクション */
+    /** ユーザーに付与する権限（ロールなど）を保存するリストです */
     private final Collection<GrantedAuthority> authorites;
 
     /**
-     * 指定された従業員アカウントと権限情報を使用して、新しいオブジェクトを構築します。
+     * コンストラクタです。
      * 
-     * @param employeeAccount 従業員アカウントのエンティティ
-     * @param authorites      ユーザーに付与する権限情報のコレクション
+     * データベースから取得した従業員データと、その人に与える権限を
+     * このクラスの中にセットします。
+     * 
+     * @param employeeAccount データベースから取得した従業員データ
+     * @param authorites      ユーザーに設定する権限のリスト
      */
     public EmployeeAccountDetails(EmployeeAccount employeeAccount, Collection<GrantedAuthority> authorites) {
         this.employeeAccount = employeeAccount;
@@ -37,9 +39,12 @@ public class EmployeeAccountDetails implements UserDetails {
     }
 
     /**
-     * ユーザーに付与された権限（ロール等）を返します。
+     * ユーザーに設定されている権限を返します。
      * 
-     * @return 権限オブジェクトのコレクション
+     * ログインしたユーザーがどのページにアクセスできるかを
+     * Spring Securityがチェックする時に使われます。
+     * 
+     * @return 権限データのコレクション
      */
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
@@ -47,9 +52,12 @@ public class EmployeeAccountDetails implements UserDetails {
     }
 
     /**
-     * ユーザーの認証に使用するパスワードを返します。
+     * データベースから取得した、ハッシュ化済みのパスワードを返します。
      * 
-     * @return 暗号化されたパスワード文字列
+     * ここで返したハッシュ化パスワードと、ユーザーがログイン画面で入力した
+     * 生のパスワードを、Spring Securityが裏側で自動的に照合してくれます。
+     * 
+     * @return データベースに保存されている暗号化されたパスワード文字列
      */
     @Override
     public String getPassword() {
@@ -57,9 +65,13 @@ public class EmployeeAccountDetails implements UserDetails {
     }
 
     /**
-     * ユーザーの認証に使用するユーザー名（アカウント名）を返します。
+     * ログイン時にユーザー名として使用する文字列を返します。
      * 
-     * @return ユーザー名
+     * 今回は employeeAccount.getName()（従業員の名前）を返すようにしています。
+     * もしログイン画面で「社員ID（数字）」を入力させる設計に変更する場合は、
+     * ここを社員IDを返すメソッドに書き換える必要があります。
+     * 
+     * @return ログイン画面のユーザー名に入力される文字列
      */
     @Override
     public String getUsername() {
@@ -67,9 +79,12 @@ public class EmployeeAccountDetails implements UserDetails {
     }
 
     /**
-     * アカウントの有効期限が切れていないかどうかを判定します。
+     * アカウントの有効期限が切れていないかをチェックするメソッドです。
      * 
-     * @return 常に {@code true} (有効)
+     * 今回の開発では有効期限の機能は使わないため、
+     * 常に「期限内である」という意味の true を返しています。
+     * 
+     * @return 常に true （有効期限切れではない）
      */
     @Override
     public boolean isAccountNonExpired() {
@@ -77,9 +92,12 @@ public class EmployeeAccountDetails implements UserDetails {
     }
 
     /**
-     * アカウントがロックされていないかどうかを判定します。
+     * アカウントがロック（凍結）されていないかをチェックするメソッドです。
      * 
-     * @return 常に {@code true} (アンロック状態)
+     * 今回の開発ではパスワード間違いによる自動ロックなどの機能はないため、
+     * 常に「ロックされていない」という意味の true を返しています。
+     * 
+     * @return 常に true （ロックされていない）
      */
     @Override
     public boolean isAccountNonLocked() {
@@ -87,12 +105,28 @@ public class EmployeeAccountDetails implements UserDetails {
     }
 
     /**
-     * 認証資格情報（パスワード）の有効期限が切れていないかどうかを判定します。
+     * パスワード自体の有効期限が切れていないかをチェックするメソッドです。
      * 
-     * @return 常に {@code true} (有効)
+     * 「定期的なパスワード変更要求」などの機能は今回実装しないため、
+     * 常に「期限内である」という意味の true を返しています。
+     * 
+     * @return 常に true （パスワードは有効）
      */
     @Override
     public boolean isCredentialsNonExpired() {
+        return true;
+    }
+
+    /**
+     * 該当のアカウントがシステム上で有効かどうかをチェックするメソッドです。
+     * 
+     * 退職フラグなどによる利用停止機能は今回作らないため、
+     * 登録されているユーザーは全員そのままログインできるように true を返しています。
+     * 
+     * @return 常に true （アカウントは有効）
+     */
+    @Override
+    public boolean isEnabled() {
         return true;
     }
 }

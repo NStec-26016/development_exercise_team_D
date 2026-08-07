@@ -1,6 +1,7 @@
 package com.example.fullness.stationary.mybatis.entity;
 
 import java.io.Serializable;
+import java.time.LocalDateTime;
 
 import lombok.Data;
 

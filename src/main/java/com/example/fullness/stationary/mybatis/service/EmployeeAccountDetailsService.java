@@ -13,55 +13,66 @@ import com.example.fullness.stationary.mybatis.repository.EmployeeAccountReposit
 import java.util.Collection;
 
 /**
- * 従業員アカウントの認証処理を行うための {@link UserDetailsService} 実装クラス。
- * <p>
- * Spring Security と連携し、データベース（MyBatis）から取得したアカウント情報を基に
- * ユーザー認証および認可に必要な {@link UserDetails} オブジェクトを構築します。
- * </p>
+ * ログイン画面での認証処理を担当するサービス（クラス）です。
  * 
- * @author YourName
+ * Spring Securityの仕組み（UserDetailsService）を利用して、
+ * ログイン時にデータベースから従業員のアカウント情報を取ってくる処理を行います。
+ * 読み取り専用の処理なので、 @Transactional(readOnly = true) をつけています。
+ * 
+ * @author 丸本
  * @version 1.0
  */
 @Service
 @Transactional(readOnly = true)
 public class EmployeeAccountDetailsService implements UserDetailsService {
 
-    /** 従業員アカウントのデータアクセスを行うリポジトリ */
+    /** 従業員アカウントのデータをDBから取得するためのリポジトリです */
     @Autowired
     EmployeeAccountRepository employeeAcountRepository;
 
     /**
-     * ユーザー名（アカウント名）をキーにデータベースを検索し、ユーザー詳細情報を取得します。
+     * ログイン画面に入力された名前を使ってデータベースを検索し、ユーザー情報を返します。
      * 
-     * @param username 認証を試みるユーザーの名前
-     * @return 認証されたユーザーの情報を持つ {@link UserDetails} オブジェクト
-     * @throws UsernameNotFoundException 指定されたユーザー名に該当するアカウントがデータベースに存在しない場合
+     * リポジトリを使って「名前」でDBを検索します。
+     * ユーザーが見つからなかった場合は、ログインエラーにするために例外を発生させます。
+     * 見つかった場合は、その人の権限（ロール）を調べてから、Spring Security用のクラスにデータを詰めて返します。
+     * 
+     * @param name ログイン画面でユーザーが入力した名前（アカウント名）
+     * @return 認証に必要なデータが詰まった EmployeeAccountDetails オブジェクト
+     * @throws UsernameNotFoundException 入力された名前のユーザーがデータベースに見つからなかった場合のエラー
      */
     @Override
     public UserDetails loadUserByUsername(String name) throws UsernameNotFoundException {
+        // 1. ログイン画面で入力された名前を使って、DBから従業員データを取得します
         EmployeeAccount employeeAccount = employeeAcountRepository.findByName(name);
+
+        // 2. データが取れなかった（nullだった）場合は、ユーザーがいないのでエラーを投げます
         if (employeeAccount == null) {
             throw new UsernameNotFoundException("user not found.");
         }
+
+        // 3. 下の getAuthorits メソッドを呼び出して、このユーザーの権限リストを作ります
         Collection<GrantedAuthority> authorites = getAuthorits(employeeAccount);
+
+        // 4. 先ほど作った EmployeeAccountDetails クラスにデータをセットして返します
         return new EmployeeAccountDetails(employeeAccount, authorites);
     }
 
     /**
-     * 従業員アカウントの役割（ロール）文字列を基に、Spring Security用の権限コレクションを生成します。
-     * <p>
-     * アカウントが保持するロール文字列を判定し、上位のロールには下位の権限（USERやGUESTなど）も含めて
-     * 段階的に権限リスト（階層的な権限モデル）を構築します。
-     * </p>
+     * 従業員アカウントのデータ（ロール）を基に、Spring Securityが理解できる権限リストを作ります。
      * 
-     * @param employeeAccount 権限を判定する従業員アカウント情報
-     * @return 付与された {@link GrantedAuthority} オブジェクトのコレクション
+     * 従業員データに設定されている役割（管理者や一般ユーザーなど）の文字列をチェックして、
+     * Spring Securityが画面のアクセス制限などで使えるように、専用のリスト（AuthorityList）に変換します。
+     * 
+     * @param employeeAccount 権限を調べるための従業員アカウントのデータ
+     * @return Spring Security用に変換した権限（ロール）のリスト
      */
     private Collection<GrantedAuthority> getAuthorits(EmployeeAccount employeeAccount) {
-        // 文字列の取得メソッド名が getEmployeeAccountRole() の場合
+        // 従業員データから役割（ロール）の文字列を取得します
         String role = employeeAccount.getEmployeeAccountRole();
 
-        // 文字列の比較は .equals() を使います
+        // ※現在は仮の実装として、一律で "Admin"（管理者権限）を設定するリストを返しています
+        // ここに if文（.equals）などを追加して、roleの中身によって権限を切り替えることもできます
         return AuthorityUtils.createAuthorityList("Admin");
     }
 }
