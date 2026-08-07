@@ -9,35 +9,23 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.ui.ModelMap;
-import org.springframework.web.servlet.view.InternalResourceViewResolver;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.forwardedUrl;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.view; // 💡 view().name() を使うためのインポート
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@SpringBootTest
+@SpringBootTest // 💡 習った通りのアノテーション
 public class LoginControllerTest {
 
     @Autowired
-    LoginController loginController;
+    LoginController loginController; // 💡 習った通りのインジェクション
 
     MockMvc mockMvc;
 
     @BeforeEach
     public void setUp() {
-
-        org.springframework.web.servlet.view.InternalResourceViewResolver viewResolver = new org.springframework.web.servlet.view.InternalResourceViewResolver();
-
-        // 1. 画面の場所をダミーの文字列で指定
-        viewResolver.setPrefix("/WEB-INF/views/");
-        viewResolver.setSuffix(".html");
-
-        viewResolver.setAlwaysInclude(true);
-
-        mockMvc = org.springframework.test.web.servlet.setup.MockMvcBuilders
-                .standaloneSetup(loginController)
-                .setViewResolvers(viewResolver)
-                .build();
+        // 💡 習ったサンプルと全く同じ、最もシンプルなスタンドアロン起動に戻します
+        mockMvc = MockMvcBuilders.standaloneSetup(loginController).build();
     }
 
     /**
@@ -48,8 +36,8 @@ public class LoginControllerTest {
         // 【テスト内容】URL /admin/login にGETリクエストを送信する
         mockMvc.perform(get("/admin/login"))
                 .andExpect(status().isOk())
-                // 【期待結果】return "login"
-                .andExpect(forwardedUrl("login"));
+                // 【期待結果】return "login" (無限ループを起こさない安全な検証方法)
+                .andExpect(view().name("admin/login"));
     }
 
     /**
@@ -57,7 +45,7 @@ public class LoginControllerTest {
      */
     @Test
     public void testShowMenuPageLoggedIn() throws Exception {
-
+        // SecurityContextHolderに「testUser」がログインした状態を強制セットする調整
         org.springframework.security.core.Authentication auth = new org.springframework.security.authentication.UsernamePasswordAuthenticationToken(
                 "testUser", "password");
         org.springframework.security.core.context.SecurityContextHolder.getContext().setAuthentication(auth);
@@ -67,17 +55,18 @@ public class LoginControllerTest {
             MvcResult mvcResult = mockMvc.perform(get("/admin"))
                     .andExpect(status().isOk())
                     // 【期待結果】return "menu"
-                    .andExpect(forwardedUrl("menu"))
-                    .andReturn();
+                    .andExpect(view().name("menu"))
+                    .andReturn(); // 習った通り andReturn() で結果を回収
 
+            // 習った通りの手順で ModelMap を取得してアサーション
             ModelMap modelMap = mvcResult.getModelAndView().getModelMap();
-            String name = (String) modelMap.get("name"); // コントローラーの実装通り、キー名は「"name"」
+            String name = (String) modelMap.get("name"); // Entity仕様のキー名「"name"」
 
             // 【期待結果】Modelにログインしたユーザー名「testUser」が正しく設定されていることを確認
             Assertions.assertEquals("testUser", name);
 
         } finally {
-            // テストが終わったら、他のテストに影響が出ないようにログイン状態をクリア
+            // テスト終了後にログイン状態をクリア
             org.springframework.security.core.context.SecurityContextHolder.clearContext();
         }
     }
@@ -91,7 +80,7 @@ public class LoginControllerTest {
         MvcResult mvcResult = mockMvc.perform(get("/admin"))
                 .andExpect(status().isOk())
                 // 【期待結果】return "menu"
-                .andExpect(forwardedUrl("menu"))
+                .andExpect(view().name("menu"))
                 .andReturn();
 
         ModelMap modelMap = mvcResult.getModelAndView().getModelMap();
@@ -107,10 +96,9 @@ public class LoginControllerTest {
     @Test
     public void testShowLoginPageWithError() throws Exception {
         // 【テスト内容】URL /admin/login?error にGETリクエストを送信する
-
         mockMvc.perform(get("/admin/login").param("error", ""))
                 .andExpect(status().isOk())
                 // 【期待結果】return "login"
-                .andExpect(forwardedUrl("login"));
+                .andExpect(view().name("admin/login"));
     }
 }
