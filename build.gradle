@@ -49,6 +49,10 @@ dependencies {
 	//Spring Securityを使うために必要
 	implementation 'org.springframework.boot:spring-boot-starter-security'
 
+	//UC017/controller単体テストにて追加
+	testImplementation 'org.springframework.security:spring-security-test'
+
+
 
 }
 
