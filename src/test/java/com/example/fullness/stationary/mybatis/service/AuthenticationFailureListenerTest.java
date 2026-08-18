@@ -87,15 +87,15 @@ public class AuthenticationFailureListenerTest {
      */
     @Test
     @DisplayName("ログイン失敗時、現在の失敗回数が1回カウントアップされること（まだ5回未満ならロックされない）")
-    void OnApplicationEvent_CountUpWithoutLockd_Test() {
+    void testOnApplicationEvent_CountUpWithoutLockd() {
         // 【1. 準備 (Given)】現在、過去の失敗回数が「2回」のアカウントを作成
         EmployeeAccount account = new EmployeeAccount();
-        account.setName(testName);
+        account.setName("丸ちゃん");
         account.setFailedAttempts(2);
         account.setLockTime(null);
 
         // リポジトリに「"丸ちゃん"を探されたら、この2回失敗しているアカウントを返しなさい」と設定
-        when(employeeAccountRepository.findByName(testName)).thenReturn(account);
+        when(employeeAccountRepository.findByName("丸ちゃん")).thenReturn(account);
 
         // 【2. 実行 (When)】テスト対象メソッドを呼び出します（パスワード間違いが発生したと仮定）
         listener.onApplicationEvent(event);
@@ -121,15 +121,15 @@ public class AuthenticationFailureListenerTest {
      */
     @Test
     @DisplayName("ログイン失敗で5回に達した場合、カウントアップされ、かつロック日時が設定されること")
-    void OnApplicationEvent_LockWhenReachedFived_Test() {
+    void testOnApplicationEvent_LockWhenReachedFived() {
         // 【1. 準備 (Given)】あと1回でアウトとなる、過去の失敗回数が「4回」のアカウントを作成
         EmployeeAccount account = new EmployeeAccount();
-        account.setName(testName);
+        account.setName("丸ちゃん");
         account.setFailedAttempts(4);
         account.setLockTime(null);
 
         // リポジトリに「"丸ちゃん"を探されたら、この4回失敗しているアカウントを返しなさい」と設定
-        when(employeeAccountRepository.findByName(testName)).thenReturn(account);
+        when(employeeAccountRepository.findByName("丸ちゃん")).thenReturn(account);
 
         // 【2. 実行 (When)】ログイン失敗イベントを発生させます（5回目のミス）
         listener.onApplicationEvent(event);
@@ -154,9 +154,9 @@ public class AuthenticationFailureListenerTest {
      */
     @Test
     @DisplayName("ユーザーがデータベースに存在しない場合、何も処理を行わず安全に終了すること")
-    void OnApplicationEvent_UserNotFoundd_Test() {
+    void testOnApplicationEvent_UserNotFound() {
         // 【1. 準備 (Given)】リポジトリに「"丸ちゃん"を探されても、null（そんな人はいない）を返しなさい」と設定
-        when(employeeAccountRepository.findByName(testName)).thenReturn(null);
+        when(employeeAccountRepository.findByName("丸ちゃん")).thenReturn(null);
 
         // 【2. 実行 ＆ 検証 (When & Then)】
         // メソッドを実行しても、途中でエラーにならずに安全に終了できるかテスト

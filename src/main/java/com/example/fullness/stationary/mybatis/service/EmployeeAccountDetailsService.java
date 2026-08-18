@@ -17,7 +17,6 @@ import java.util.Collection;
  * 
  * Spring Securityの仕組み（UserDetailsService）を利用して、
  * ログイン時にデータベースから従業員のアカウント情報を取ってくる処理を行います。
- * 読み取り専用の処理なので、 @Transactional(readOnly = true) をつけています。
  * 
  * @author 丸本
  * @version 1.0

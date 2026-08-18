@@ -45,14 +45,14 @@ public class AuthenticationSuccessListenerTest {
 
     @Test
     @DisplayName("過去に失敗履歴がある場合、回数が0になりロック日時がクリアされてDBが更新されること")
-    void OnApplicationEvent_ResetSuccess_Test() {
+    void testOnApplicationEvent_ResetSuccess() {
         // 準備: 失敗回数が3回、ロック日時が入っているアカウントを用意
         EmployeeAccount account = new EmployeeAccount();
-        account.setName(testName);
+        account.setName("丸ちゃん");
         account.setFailedAttempts(3);
         account.setLockTime(LocalDateTime.now());
 
-        when(employeeAccountRepository.findByName(testName)).thenReturn(account);
+        when(employeeAccountRepository.findByName("丸ちゃん")).thenReturn(account);
 
         // 実行
         listener.onApplicationEvent(event);
@@ -67,14 +67,14 @@ public class AuthenticationSuccessListenerTest {
 
     @Test
     @DisplayName("過去に失敗履歴がない場合、DBの更新処理が呼び出されないこと")
-    void OnApplicationEvent_NoActionNeeded_Test() {
+    void testOnApplicationEvent_NoActionNeeded() {
         // 準備: 失敗回数が0回、ロック日時も無しの綺麗なアカウントを用意
         EmployeeAccount account = new EmployeeAccount();
-        account.setName(testName);
+        account.setName("丸ちゃん");
         account.setFailedAttempts(0);
         account.setLockTime(null);
 
-        when(employeeAccountRepository.findByName(testName)).thenReturn(account);
+        when(employeeAccountRepository.findByName("丸ちゃん")).thenReturn(account);
 
         // 実行
         listener.onApplicationEvent(event);
@@ -89,9 +89,9 @@ public class AuthenticationSuccessListenerTest {
 
     @Test
     @DisplayName("ユーザーがデータベースに存在しない場合、何も処理を行わずエラーにならないこと")
-    void OnApplicationEvent_UserNotFound_Test() {
+    void testOnApplicationEvent_UserNotFound() {
         // 準備: 該当ユーザーがDBから見つからない（nullが返る）状態を再現
-        when(employeeAccountRepository.findByName(testName)).thenReturn(null);
+        when(employeeAccountRepository.findByName("丸ちゃん")).thenReturn(null);
 
         // 実行 & 検証: エラーが発生せずに終了すること
         listener.onApplicationEvent(event);

@@ -11,6 +11,9 @@ import java.time.LocalDateTime;
 /**
  * ログイン失敗（パスワード間違いなど）を検知して、
  * 失敗回数のカウントアップやアカウントロックを行うクラスです。
+ * 
+ * @author 丸本
+ * @version 1.0
  */
 @Component
 public class AuthenticationFailureListener implements ApplicationListener<AuthenticationFailureBadCredentialsEvent> {

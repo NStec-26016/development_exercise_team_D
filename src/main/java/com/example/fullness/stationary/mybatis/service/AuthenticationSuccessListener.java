@@ -9,7 +9,10 @@ import org.springframework.stereotype.Component;
 
 /**
  * ログイン成功を検知して、
- * 過去の失敗回数のリセットやロック日時のクリアを行うクラスです。
+ * 過去の失敗回数のカウントリセットやロック日時の設定を行うクラスです。
+ * 
+ * @author 丸本
+ * @version 1.0
  */
 @Component
 public class AuthenticationSuccessListener implements ApplicationListener<AuthenticationSuccessEvent> {

@@ -25,10 +25,10 @@ class EmployeeAccountDetailsServiceTest {
     private EmployeeAccountDetailsService employeeAccountDetailsService;
 
     @Test
-    @DisplayName("存在するユーザー名を指定した場合、その人の情報がが正しく返却されること")
-    void loadUserByUsername_success() {
+    @DisplayName("存在するユーザー名を指定した場合、その人の情報が正しく返却されること")
+    void testloadUserByUsername_success() {
         // [1] テストデータの準備
-        String username = "丸本 翔太郎";
+        String username = "丸ちゃん";
         EmployeeAccount mockAccount = new EmployeeAccount();
 
         // [2] モックの動作定義（Repositoryが指定した名前で呼ばれたら、mockAccountを返す）
@@ -43,7 +43,7 @@ class EmployeeAccountDetailsServiceTest {
 
         // 権限の検証（現在の一律"Admin"が設定されているか確認）
         boolean hasAdminRole = result.getAuthorities().stream()
-                .anyMatch(auth -> auth.getAuthority().equals("Admin"));
+                .anyMatch(auth -> auth.getAuthority().equals("ROLE_Admin"));
         assertTrue(hasAdminRole, "権限にAdminが含まれていること");
 
         // リポジトリのメソッドが1回呼ばれたことを検証
@@ -52,7 +52,7 @@ class EmployeeAccountDetailsServiceTest {
 
     @Test
     @DisplayName("存在しないユーザー名を指定した場合、UsernameNotFoundExceptionが発生すること")
-    void loadUserByUsername_userNotFound() {
+    void testloadUserByUsername_userNotFound() {
         // [1] テストデータの準備
         String username = "存在しないユーザー";
 

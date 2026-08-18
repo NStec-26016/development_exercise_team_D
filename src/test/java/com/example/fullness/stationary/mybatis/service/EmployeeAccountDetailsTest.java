@@ -41,7 +41,7 @@ public class EmployeeAccountDetailsTest {
      */
     @Test
     @DisplayName("エンティティに設定されたユーザー名、パスワード、権限が正しく取得できること")
-    void GettersAndBasicProperties_Test() {
+    void testGettersAndBasicProperties() {
         // 【1. 準備 】検証用のテストデータをセットした本物のエンティティを用意
         EmployeeAccount account = new EmployeeAccount();
         account.setName("丸ちゃん");
@@ -63,7 +63,7 @@ public class EmployeeAccountDetailsTest {
      */
     @Test
     @DisplayName("ロック日時が設定されていない場合、isAccountNonLockedがtrueを返すこと")
-    void IsAccountNonLocked_WhenLockTimeIsNull_Test() {
+    void testIsAccountNonLocked_WhenLockTimeIsNull() {
         // 【1. 準備 】ロック日時が null（初期状態）のアカウントを用意
         EmployeeAccount account = new EmployeeAccount();
         account.setLockTime(null);
@@ -83,8 +83,8 @@ public class EmployeeAccountDetailsTest {
      */
     @Test
     @DisplayName("ロックされてから10分未満の場合、isAccountNonLockedがfalseを返すこと")
-    void IsAccountNonLocked_WhenWithinTenMinutes_Test() {
-        // 【1. 準備 】たった今（5分前など）ロックされたアカウントを再現
+    void testIsAccountNonLocked_WhenWithinTenMinutes() {
+        // 【1. 準備 】5分前ロックされたアカウントを再現
         // 現在時刻から5分前をロック時刻として設定します
         LocalDateTime fiveMinutesAgo = LocalDateTime.now().minusMinutes(5);
 
@@ -107,7 +107,7 @@ public class EmployeeAccountDetailsTest {
      */
     @Test
     @DisplayName("ロックされてから10分以上経過している場合、isAccountNonLockedがtrueを返すこと")
-    void IsAccountNonLocked_WhenOverTenMinutes_Test() {
+    void testIsAccountNonLocked_WhenOverTenMinutes() {
         // 【1. 準備 】11分前にロックされ、すでにペナルティ時間を終えたアカウントを再現
         // 現在時刻から11分前をロック時刻として設定します
         LocalDateTime elevenMinutesAgo = LocalDateTime.now().minusMinutes(11);
@@ -130,7 +130,7 @@ public class EmployeeAccountDetailsTest {
      */
     @Test
     @DisplayName("有効期限や有効フラグのメソッドが、常にtrueを返すこと")
-    void AlwaysTrueMethods_Test() {
+    void tsetAlwaysTrueMethods() {
         // 【1. 準備 】中身が空のアカウントを用意
         EmployeeAccount account = new EmployeeAccount();
         EmployeeAccountDetails details = new EmployeeAccountDetails(account, authorities);
