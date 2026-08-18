@@ -1,0 +1,82 @@
+:root {
+    --fs-green: #1a7a5e;
+    --fs-green-dark: #14604a;
+    --fs-green-light: #e6f3ef;
+}
+
+body {
+    background-color: var(--fs-green-light);
+}
+
+.admin-header {
+    background-color: #fff;
+    border-top: 4px solid var(--fs-green);
+    border-bottom: 2px solid var(--fs-green);
+}
+
+.admin-header .admin-title {
+    color: var(--fs-green);
+    font-weight: 700;
+    text-decoration: none;
+}
+
+.admin-header .nav-link {
+    color: var(--fs-green-dark);
+    font-weight: 600;
+}
+
+.admin-header .nav-link:hover {
+    color: var(--fs-green);
+}
+
+.admin-footer {
+    background-color: #fff;
+    border-top: 2px solid var(--fs-green);
+    color: var(--fs-green-dark);
+    font-weight: 700;
+}
+
+.admin-panel {
+    background-color: #fff;
+    border: 1px solid #d7e7e1;
+    border-radius: 4px;
+}
+
+.admin-panel h1 {
+    color: var(--fs-green-dark);
+    font-size: 1.5rem;
+    font-weight: 700;
+}
+
+.btn-fs {
+    color: var(--fs-green);
+    background-color: #fff;
+    border: 1px solid var(--fs-green);
+}
+
+.btn-fs:hover {
+    color: #fff;
+    background-color: var(--fs-green);
+}
+
+.btn-fs-solid {
+    color: #fff;
+    background-color: var(--fs-green);
+    border: 1px solid var(--fs-green);
+}
+
+.btn-fs-solid:hover {
+    color: #fff;
+    background-color: var(--fs-green-dark);
+    border-color: var(--fs-green-dark);
+}
+
+.table-thumb {
+    width: 100px;
+    height: auto;
+    object-fit: contain;
+}
+
+a.link-fs {
+    color: var(--fs-green-dark);
+}

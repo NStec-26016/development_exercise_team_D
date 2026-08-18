@@ -1,11 +1,13 @@
-package com.example.fullness.stationary.mybatis.config;
+package com.example.fullness.stationary.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.NoOpPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 /**
@@ -49,8 +51,12 @@ public class SecurityConfig {
 
    @Bean
    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+      http.csrf(csrf -> csrf.disable());
       http.authorizeHttpRequests(authz -> authz
-            .requestMatchers("/", "/admin", "/admin/login").permitAll()
+            .requestMatchers("/error").permitAll()
+            // ⬇️ ここにCSSなどの静的リソースを許可する設定を追加しました
+            .requestMatchers("/css/**", "/js/**", "/images/**").permitAll()
+            .requestMatchers("/admin", "/admin/login").permitAll()
             .anyRequest().authenticated())
             .formLogin(login -> login
                   // ログイン認証画面を出力するURLパスを表す
@@ -58,11 +64,11 @@ public class SecurityConfig {
                   // 指定されたURL パスの場合ログイン認証することを表す
                   .loginProcessingUrl("/admin/login")
                   // ユーザ名とパスワードのリクエストパラメータ名を表す
-                  .usernameParameter("name")
+                  .usernameParameter("accountName")
                   .passwordParameter("password")
                   // 認証が成功した場合にリダイレクトするURLパスを指定する。2番目の引数にはログインが成功したら必ず指定された
                   // パスに遷移させたい場合true を指定する
-                  .defaultSuccessUrl("/menu", true)
+                  .defaultSuccessUrl("/admin", true)
                   // ログイン認証に失敗した場合に遷移するURLパスを表す
                   .failureUrl("/admin/login?error")
                   // ログイン認証の動作はいつでも許可することを表す
@@ -94,7 +100,10 @@ public class SecurityConfig {
 
    @Bean
    public PasswordEncoder passwordEncoder() {
-      return new BCryptPasswordEncoder();
+      // TODO 後でハッシュ値を使うパターンに戻す
+      // return new BCryptPasswordEncoder();
+
+      return NoOpPasswordEncoder.getInstance();
    }
 
 }
