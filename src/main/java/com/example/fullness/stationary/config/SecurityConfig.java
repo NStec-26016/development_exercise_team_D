@@ -15,7 +15,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
  * 
  *
  * @author 長田
- * @version 0.01
+ * @version 1.0
  */
 
 @EnableWebSecurity

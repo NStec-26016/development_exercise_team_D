@@ -9,7 +9,13 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import com.example.fullness.stationary.mybatis.entity.EmployeeAccount;
 
-@MybatisTest(properties = "mybatis.type-aliases-package=com.example.fullness.stationary.mybatis.entity")
+@MybatisTest(
+    properties = "mybatis.type-aliases-package=com.example.fullness.stationary.mybatis.entity",
+    excludeAutoConfiguration = {
+        org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration.class,
+        org.springframework.boot.autoconfigure.security.servlet.UserDetailsServiceAutoConfiguration.class
+    }
+)
 
 public class EmployeeAccountRepositoryTest {
 
