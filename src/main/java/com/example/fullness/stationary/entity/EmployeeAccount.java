@@ -1,4 +1,4 @@
-package com.example.fullness.stationary.mybatis.entity;
+package com.example.fullness.stationary.entity;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;

@@ -1,10 +1,10 @@
-package com.example.fullness.stationary.mybatis.repository;
+package com.example.fullness.stationary.repository;
 
 import org.apache.ibatis.annotations.Mapper;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
-import com.example.fullness.stationary.mybatis.entity.EmployeeAccount;
+import com.example.fullness.stationary.entity.EmployeeAccount;
 
 /**
  * 担当者アカウントに関するデータアクセスを管理するリポジトリインターフェース。

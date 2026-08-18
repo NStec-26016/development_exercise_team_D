@@ -1,4 +1,4 @@
-package com.example.fullness.stationary.mybatis.service;
+package com.example.fullness.stationary.security;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -12,8 +12,9 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 
-import com.example.fullness.stationary.mybatis.entity.EmployeeAccount;
-import com.example.fullness.stationary.mybatis.repository.EmployeeAccountRepository;
+import com.example.fullness.stationary.entity.EmployeeAccount;
+import com.example.fullness.stationary.repository.EmployeeAccountRepository;
+import com.example.fullness.stationary.security.EmployeeAccountDetailsService;
 
 @ExtendWith(MockitoExtension.class)
 class EmployeeAccountDetailsServiceTest {

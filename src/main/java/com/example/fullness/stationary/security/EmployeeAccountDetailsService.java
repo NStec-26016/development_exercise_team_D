@@ -1,4 +1,4 @@
-package com.example.fullness.stationary.mybatis.service;
+package com.example.fullness.stationary.security;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.GrantedAuthority;
@@ -8,8 +8,10 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import com.example.fullness.stationary.mybatis.entity.EmployeeAccount;
-import com.example.fullness.stationary.mybatis.repository.EmployeeAccountRepository;
+
+import com.example.fullness.stationary.entity.EmployeeAccount;
+import com.example.fullness.stationary.repository.EmployeeAccountRepository;
+
 import java.util.Collection;
 
 /**
