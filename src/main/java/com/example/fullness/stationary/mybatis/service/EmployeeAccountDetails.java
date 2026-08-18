@@ -4,6 +4,7 @@ import com.example.fullness.stationary.mybatis.entity.EmployeeAccount;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import java.time.LocalDateTime;
 import java.util.Collection;
 
 /**
@@ -92,22 +93,31 @@ public class EmployeeAccountDetails implements UserDetails {
     }
 
     /**
-     * アカウントがロック（凍結）されていないかをチェックするメソッドです。
+     * アカウントがロックされていないかをチェックするメソッドです。
      * 
-     * 今回の開発ではパスワード間違いによる自動ロックなどの機能はないため、
-     * 常に「ロックされていない」という意味の true を返しています。
+     * データベースから取得した従業員データ（employeeAccount）のロック日時を確認し、
+     * ロック期間（10分間）が経過しているかどうかを判定して結果を返します。
      * 
-     * @return 常に true （ロックされていない）
+     * @return ロックされていなければ true、ロック中であれば false
      */
     @Override
     public boolean isAccountNonLocked() {
-        return true;
+        // ロック日時（lockTime）がセットされていなければ、ロックされていないので true
+        if (this.employeeAccount.getLockTime() == null) {
+            return true;
+        }
+
+        // ロック解除時刻（ロックされた時間 ＋ 10分）を計算
+        LocalDateTime unlockTime = this.employeeAccount.getLockTime().plusMinutes(10);
+
+        // 現在時刻がロック解除時刻を過ぎている（after）なら、ロックは終了しているので true
+        // まだ過ぎていない（before）なら、ロック中なので false を返す
+        return LocalDateTime.now().isAfter(unlockTime);
     }
 
     /**
      * パスワード自体の有効期限が切れていないかをチェックするメソッドです。
      * 
-     * 「定期的なパスワード変更要求」などの機能は今回実装しないため、
      * 常に「期限内である」という意味の true を返しています。
      * 
      * @return 常に true （パスワードは有効）
@@ -119,9 +129,6 @@ public class EmployeeAccountDetails implements UserDetails {
 
     /**
      * 該当のアカウントがシステム上で有効かどうかをチェックするメソッドです。
-     * 
-     * 退職フラグなどによる利用停止機能は今回作らないため、
-     * 登録されているユーザーは全員そのままログインできるように true を返しています。
      * 
      * @return 常に true （アカウントは有効）
      */

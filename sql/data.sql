@@ -35,6 +35,8 @@ create table employee_account(
     employee_id integer,
     name varchar(20) not null,
     password varchar(200),
+    failed_attempts integer default 0 not null, 
+    lock_time timestamp null,                   
     primary key (id),
     FOREIGN KEY (employee_id) REFERENCES employee(id)
 );
@@ -131,5 +133,7 @@ insert into department (name) values ('人事部');
 insert into employee (department_id, name, name_kana) values (1, '丸本翔太郎', 'マルモトショウタロウ');
 
 -- 社員アカウント（自動的に id = 1 で登録。社員IDには上で生成された「1」を指定）
--- insert into employee_account (employee_id, name, password) values (1, '丸ちゃん', 'maru');
 insert into employee_account (employee_id, name, password) values (1, '丸ちゃん', '$2a$10$wO3l2UiwZ3U13B0r8G9T2O6ZfL3r2zWjR3M7q6Nn/y5u8u7xMvKy6');
+
+insert into employee (department_id, name, name_kana) values (1, '紺谷', 'コンヤ');
+insert into employee_account (employee_id, name, password) values (2, 'こんや', 'konya'); -- ⬅️ 最後のセミコロン（;）を補正しました
