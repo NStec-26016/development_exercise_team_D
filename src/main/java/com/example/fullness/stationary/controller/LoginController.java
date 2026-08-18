@@ -61,7 +61,7 @@ public class LoginController {
 
             model.addAttribute("loggedIn", true);
         } else {
-            // ⭕ ログインしていないので、Thymeleafヘッダーに「false」を渡します
+            // ログインしていないので、Thymeleafヘッダーに「false」を渡す
             model.addAttribute("loggedIn", false);
         }
 
