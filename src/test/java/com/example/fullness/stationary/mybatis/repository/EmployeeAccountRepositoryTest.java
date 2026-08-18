@@ -9,7 +9,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import com.example.fullness.stationary.mybatis.entity.EmployeeAccount;
 
-@MybatisTest
+@MybatisTest(properties = "mybatis.type-aliases-package=com.example.fullness.stationary.mybatis.entity")
+
 public class EmployeeAccountRepositoryTest {
 
     @Autowired
@@ -17,7 +18,7 @@ public class EmployeeAccountRepositoryTest {
 
     // 存在するアカウント名での検索
     @Test
-    @Sql("/test-data/EmployeeAccountRepository_findByName.sql")
+    @Sql("/com/example/fullness/stationary/mybatis/repository/EmployeeAccountRepository_findByName.sql")
     void EmployeeAccountRepositoryTest_OK() {
         // 引数（入力値）に「丸ちゃん」を指定して実行
         EmployeeAccount account = repository.findByName("丸ちゃん");
@@ -32,7 +33,7 @@ public class EmployeeAccountRepositoryTest {
 
     // 引数にnullを渡した場合の検索
     @Test
-    @Sql("/test-data/EmployeeAccountRepository_findByName.sql")
+    @Sql("/com/example/fullness/stationary/mybatis/repository/EmployeeAccountRepository_findByName.sql")
     void EmployeeAccountRepositoryTest_NG1() {
         // 引数に存在しないアカウント名を指定して実行
         EmployeeAccount account = repository.findByName("unknown");
@@ -43,7 +44,7 @@ public class EmployeeAccountRepositoryTest {
 
     // 引数にnullを渡した場合の検索
     @Test
-    @Sql("/test-data/EmployeeAccountRepository_findByName.sql")
+    @Sql("/com/example/fullness/stationary/mybatis/repository/EmployeeAccountRepository_findByName.sql")
     void EmployeeAccountRepositoryTest_NG2() {
         // 引数にnullを指定して実行
         EmployeeAccount account = repository.findByName(null);

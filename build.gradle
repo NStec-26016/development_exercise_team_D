@@ -49,9 +49,19 @@ dependencies {
 	//Spring Securityを使うために必要
 	implementation 'org.springframework.boot:spring-boot-starter-security'
 
+    //@MybatisTestを動かす 
+	testImplementation 'com.h2database:h2'
+	
+
 
 }
 
 tasks.named('test') {
 	useJUnitPlatform()
+}
+
+sourceSets {
+    test {
+        resources.srcDirs += ['src/test/java']
+    }
 }
