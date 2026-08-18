@@ -8,46 +8,69 @@ import org.springframework.web.bind.annotation.GetMapping;
 
 /**
  * ログインおよびメニュー画面の画面遷移を制御するコントローラークラス。
- * <p>
- * 本クラスは、認証画面（Login）の表示制御、および認証成功後のメニュー画面（Menu）の表示制御を行います。
- * 実際の認証判定、セッション管理、ログアウトのロジックはSpring Securityのフィルター層によって自動処理されます。
- * </p>
- * 
- * @author Team_D 深堀
  */
 @Controller
 public class LoginController {
 
     /**
      * ログイン画面を表示します。
-     * <p>
-     * URL「/admin/login」へのGETリクエストに対して、ログイン用HTML（templates/login.html）を返却します。
-     * </p>
-     *
-     * @return ログイン画面のビュー名 "login"
+     * 💡【修正】：エラーの詳細理由を判定するために、引数に「jakarta.servlet.http.HttpServletRequest」を追加しています。
      */
     @GetMapping("/admin/login")
-    public String showLoginPage(org.springframework.ui.Model model) {
-        model.addAttribute("errorMessage", "");
+    public String showLoginPage(
+            org.springframework.ui.Model model,
+            @org.springframework.web.bind.annotation.RequestParam(value = "error", required = false) String error,
+            jakarta.servlet.http.HttpServletRequest request) { // 💡 エラー詳細を取得するために追記
+
+        if (error != null) {
+            // 💡 Spring Securityが自動で保存している「最後のログイン失敗理由（例外オブジェクト）」を取得します
+            Object lastException = request.getSession().getAttribute("SPRING_SECURITY_LAST_EXCEPTION");
+
+            // デフォルトのメッセージ（例外が取れなかった場合の安全策）
+            String errorMsg = "アカウント名またはパスワードが正しくありません";
+
+            if (lastException != null) {
+                String exceptionClassName = lastException.getClass().getName();
+
+                // 1️⃣ アカウントロック時の判定（LockedExceptionなど）
+                if (exceptionClassName.contains("LockedException")) {
+                    errorMsg = "アカウントがロックされています。しばらく経ってから再度お試しください";
+
+                    // 2️⃣ DB接続エラー・システムエラーの判定（InternalAuthenticationServiceException や
+                    // DataAccessResouce系など）
+                } else if (exceptionClassName.contains("AuthenticationServiceException")
+                        || exceptionClassName.contains("DataAccess")
+                        || exceptionClassName.contains("InternalAuthenticationServiceException")) {
+                    errorMsg = "システムエラーが発生しました。管理者に連絡してください";
+
+                    // 💡 エラーログに詳細情報を記録（コンソールおよびログファイルに出力されます）
+                    System.err.println("[ERROR] ログイン処理中にシステム/DB接続エラーが発生しました。詳細: " + lastException);
+
+                    // 3️⃣ 認証情報不一致（BadCredentialsException：パスワード間違いなど）
+                } else if (exceptionClassName.contains("BadCredentialsException")) {
+                    errorMsg = "アカウント名またはパスワードが正しくありません";
+
+                    // 💡 ログイン失敗回数をカウント（コンソール等に記録、実務ではここでServiceを呼び出してDBのカウントを+1します）
+                    System.out.println(
+                            "[INFO] 認証不一致によりログインが失敗しました。失敗回数をカウントします。対象: " + request.getParameter("accountName"));
+                }
+            }
+
+            // 判定したメッセージをModelにセット（ピンクの枠が出現します）
+            model.addAttribute("errorMessage", errorMsg);
+
+        } else {
+            // 通常時（最初に画面を開いたとき）は null を渡してピンクの枠ごと消し去ります
+            model.addAttribute("errorMessage", null);
+        }
+
         model.addAttribute("accountName", "");
-        // templates/admin/login.html を見に行かせます
         model.addAttribute("loggedIn", false);
         return "admin/login";
     }
 
     /**
-     * 
-     * 
      * メニュー画面を表示します。
-     * <p>
-     * URL「/admin」へのGETリクエストを処理します。
-     * Spring Securityのコンテキストから現在ログイン中の認証情報を取得し、
-     * ログイン済みであればユーザー名を画面（Model）に設定します。
-     * 未ログインの場合は、ユーザー名を設定せずに画面を表示します。
-     * </p>
-     *
-     * @param model 画面へデータを渡すためのModelオブジェクト
-     * @return メニュー画面のビュー名 "menu"
      */
     @GetMapping("/admin")
     public String showMenuPage(Model model) {
@@ -57,11 +80,9 @@ public class LoginController {
         if (authentication != null && authentication.isAuthenticated()
                 && !"anonymousUser".equals(authentication.getName())) {
             String loginUserName = authentication.getName();
-            model.addAttribute("name", loginUserName);
-
+            model.addAttribute("loginEmployeeName", loginUserName);
             model.addAttribute("loggedIn", true);
         } else {
-            // ⭕ ログインしていないので、Thymeleafヘッダーに「false」を渡します
             model.addAttribute("loggedIn", false);
         }
 
