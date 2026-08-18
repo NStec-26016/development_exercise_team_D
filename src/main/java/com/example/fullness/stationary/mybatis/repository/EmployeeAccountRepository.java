@@ -26,6 +26,11 @@ public interface EmployeeAccountRepository {
      */
     EmployeeAccount findByName(@Param("name") String name);
 
+    /**
+     * ログイン失敗回数とロック日時を更新する。
+     */
+    void updateLockStatus(EmployeeAccount employeeAccount);
+
     // UC09 担当者アカウント登録
     int insertEmployeeAccount(EmployeeAccount employeeAccount);
 }
