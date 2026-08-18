@@ -4,12 +4,13 @@
 <mapper namespace="com.example.fullness.stationary.mybatis.repository.EmployeeAccountRepository">
 
     <!-- 【UC17 担当者ログイン用】アカウント単体（パスワード照合用）のマッピング -->
-    <!-- ⬇️ 消えていた開始タグを正しく復活させました -->
-      <resultMap id="EmployeeAccountResult" type="EmployeeAccount">
+    <resultMap id="EmployeeAccountResult" type="EmployeeAccount">
         <id property="id" column="id" /> 
         <result property="employeeId" column="employee_id" /> 
         <result property="name" column="name" /> 
         <result property="password" column="password"/>
+        <result property="failedAttempts" column="failed_attempts"/>
+        <result property="lockTime" column="lock_time"/>
     </resultMap>
 
     <!-- 【UC17 担当者ログイン】アカウント名からパスワード照合のために1件取得する -->
@@ -18,9 +19,21 @@
             id,
             employee_id,
             name,
-            password
+            password,
+            failed_attempts,
+            lock_time
         FROM employee_account
         WHERE name = #{name} 
     </select>
+
+    <!-- ログイン失敗回数とロック日時の更新用SQL -->
+    <update id="updateLockStatus" parameterType="com.example.fullness.stationary.mybatis.entity.EmployeeAccount">
+        UPDATE employee_account
+        SET 
+            failed_attempts = #{failedAttempts},
+            lock_time = #{lockTime}
+        WHERE 
+            name = #{name}
+    </update>
 
 </mapper>
