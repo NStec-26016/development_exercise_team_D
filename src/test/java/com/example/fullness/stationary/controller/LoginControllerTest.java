@@ -10,6 +10,7 @@ import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.servlet.view.InternalResourceViewResolver;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.view;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.forwardedUrl;
@@ -49,7 +50,7 @@ public class LoginControllerTest {
         mockMvc.perform(get("/admin/login"))
                 .andExpect(status().isOk())
                 // 【期待結果】return "login"
-                .andExpect(forwardedUrl("login"));
+                .andExpect(view().name("admin/login"));
     }
 
     /**
@@ -67,7 +68,7 @@ public class LoginControllerTest {
             MvcResult mvcResult = mockMvc.perform(get("/admin"))
                     .andExpect(status().isOk())
                     // 【期待結果】return "menu"
-                    .andExpect(forwardedUrl("menu"))
+                    .andExpect(view().name("admin"))
                     .andReturn();
 
             ModelMap modelMap = mvcResult.getModelAndView().getModelMap();
@@ -91,7 +92,7 @@ public class LoginControllerTest {
         MvcResult mvcResult = mockMvc.perform(get("/admin"))
                 .andExpect(status().isOk())
                 // 【期待結果】return "menu"
-                .andExpect(forwardedUrl("menu"))
+                .andExpect(view().name("admin"))
                 .andReturn();
 
         ModelMap modelMap = mvcResult.getModelAndView().getModelMap();
@@ -111,6 +112,6 @@ public class LoginControllerTest {
         mockMvc.perform(get("/admin/login").param("error", ""))
                 .andExpect(status().isOk())
                 // 【期待結果】return "login"
-                .andExpect(forwardedUrl("login"));
+                .andExpect(view().name("admin/login"));
     }
 }
