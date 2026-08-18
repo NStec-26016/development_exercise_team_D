@@ -128,7 +128,7 @@ public class LoginController {
 
             // ログイン中のアカウント名を取得し、メニュー画面の「th:text="${loginEmployeeName}"」にマッピング
             String loginUserName = authentication.getName();
-            model.addAttribute("loginEmployeeName", loginUserName);
+            model.addAttribute("name", loginUserName);
             model.addAttribute("loggedIn", true);
         } else {
             // 未ログイン時はヘッダー部品（th:unless="${loggedIn}"）を「ログインボタン」に反応させる

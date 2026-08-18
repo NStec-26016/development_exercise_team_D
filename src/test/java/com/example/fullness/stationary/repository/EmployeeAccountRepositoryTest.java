@@ -1,13 +1,14 @@
-package com.example.fullness.stationary.mybatis.repository;
+package com.example.fullness.stationary.repository;
 
 import org.junit.jupiter.api.Test;
 import org.mybatis.spring.boot.test.autoconfigure.MybatisTest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.jdbc.Sql;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import com.example.fullness.stationary.entity.EmployeeAccount;
+import com.example.fullness.stationary.repository.EmployeeAccountRepository;
 
-import com.example.fullness.stationary.mybatis.entity.EmployeeAccount;
+import static org.assertj.core.api.Assertions.assertThat;
 
 @MybatisTest(properties = "mybatis.type-aliases-package=com.example.fullness.stationary.mybatis.entity")
 

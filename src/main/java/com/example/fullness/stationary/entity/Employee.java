@@ -1,11 +1,11 @@
-package com.example.fullness.stationary.mybatis.entity;
+package com.example.fullness.stationary.entity;
 
 import java.io.Serializable;
 
 import lombok.Data;
 
 @Data
-public class Employee implements Serializable{
+public class Employee implements Serializable {
 
     private Integer id;
 

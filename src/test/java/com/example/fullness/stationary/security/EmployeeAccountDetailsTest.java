@@ -1,12 +1,14 @@
-package com.example.fullness.stationary.mybatis.service;
+package com.example.fullness.stationary.security;
 
-import com.example.fullness.stationary.mybatis.entity.EmployeeAccount;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.core.GrantedAuthority;
+
+import com.example.fullness.stationary.entity.EmployeeAccount;
+import com.example.fullness.stationary.security.EmployeeAccountDetails;
 
 import java.time.LocalDateTime;
 import java.util.Collection;
