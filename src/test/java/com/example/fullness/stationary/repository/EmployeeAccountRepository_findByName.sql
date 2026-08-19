@@ -20,6 +20,6 @@ INSERT INTO employee_account (id, employee_id, name, password)
 VALUES (
     1, 
     1, 
-    '丸ちゃん', 
-    '$2a$10$wO3l2UiwZ3U13B0r8G9T2O6ZfL3r2zWjR3M7q6Nn/y5u8u7xMvKy6'
+    'marumoto', 
+    'maru1'
 );

@@ -23,15 +23,15 @@ public class EmployeeAccountRepositoryTest {
     @Test
     @Sql("/com/example/fullness/stationary/repository/EmployeeAccountRepository_findByName.sql")
     void EmployeeAccountRepositoryTest_OK() {
-        // 引数（入力値）に「丸ちゃん」を指定して実行
-        EmployeeAccount account = repository.findByName("丸ちゃん");
+        // 引数（入力値）に「marumoto」を指定して実行
+        EmployeeAccount account = repository.findByName("marumoto");
 
         // 仕様書の期待結果と1対1で一致する検証コード
         assertThat(account).isNotNull();
         assertThat(account.getId()).isEqualTo(1);
         assertThat(account.getEmployeeId()).isEqualTo(1);
-        assertThat(account.getName()).isEqualTo("丸ちゃん");
-        assertThat(account.getPassword()).isEqualTo("$2a$10$wO3l2UiwZ3U13B0r8G9T2O6ZfL3r2zWjR3M7q6Nn/y5u8u7xMvKy6");
+        assertThat(account.getName()).isEqualTo("marumoto");
+        assertThat(account.getPassword()).isEqualTo("maru1");
     }
 
     // 引数にnullを渡した場合の検索
