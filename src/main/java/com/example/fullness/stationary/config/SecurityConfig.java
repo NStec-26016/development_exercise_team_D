@@ -75,7 +75,7 @@ public class SecurityConfig {
                   .permitAll())
             .logout(logout -> logout
                   // 引数のURL パスの場合にログアウト処理することを表す
-                  .logoutUrl("/logout")
+                  .logoutUrl("/admin/logout")
                   // ログアウト処理が成功した場合の遷移先パスを表す
                   .logoutSuccessUrl("/admin")
                   // セッションを破棄することを表す
