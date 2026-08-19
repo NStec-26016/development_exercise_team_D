@@ -2,7 +2,6 @@ package com.example.fullness.stationary.security.listener;
 
 import com.example.fullness.stationary.entity.EmployeeAccount;
 import com.example.fullness.stationary.repository.EmployeeAccountRepository;
-import com.example.fullness.stationary.security.listener.AuthenticationSuccessListener;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -36,7 +35,7 @@ public class AuthenticationSuccessListenerTest {
     @Mock
     private Authentication authentication;
 
-    private final String testName = "丸ちゃん";
+    private final String testName = "marumoto";
 
     @BeforeEach
     void setUp() {
@@ -50,11 +49,11 @@ public class AuthenticationSuccessListenerTest {
     void testOnApplicationEvent_ResetSuccess() {
         // 準備: 失敗回数が3回、ロック日時が入っているアカウントを用意
         EmployeeAccount account = new EmployeeAccount();
-        account.setName("丸ちゃん");
+        account.setName("marumoto");
         account.setFailedAttempts(3);
         account.setLockTime(LocalDateTime.now());
 
-        when(employeeAccountRepository.findByName("丸ちゃん")).thenReturn(account);
+        when(employeeAccountRepository.findByName("marumoto")).thenReturn(account);
 
         // 実行
         listener.onApplicationEvent(event);
@@ -72,11 +71,11 @@ public class AuthenticationSuccessListenerTest {
     void testOnApplicationEvent_NoActionNeeded() {
         // 準備: 失敗回数が0回、ロック日時も無しの綺麗なアカウントを用意
         EmployeeAccount account = new EmployeeAccount();
-        account.setName("丸ちゃん");
+        account.setName("marumoto");
         account.setFailedAttempts(0);
         account.setLockTime(null);
 
-        when(employeeAccountRepository.findByName("丸ちゃん")).thenReturn(account);
+        when(employeeAccountRepository.findByName("marumoto")).thenReturn(account);
 
         // 実行
         listener.onApplicationEvent(event);
@@ -93,7 +92,7 @@ public class AuthenticationSuccessListenerTest {
     @DisplayName("ユーザーがデータベースに存在しない場合、何も処理を行わずエラーにならないこと")
     void testOnApplicationEvent_UserNotFound() {
         // 準備: 該当ユーザーがDBから見つからない（nullが返る）状態を再現
-        when(employeeAccountRepository.findByName("丸ちゃん")).thenReturn(null);
+        when(employeeAccountRepository.findByName("marumoto")).thenReturn(null);
 
         // 実行 & 検証: エラーが発生せずに終了すること
         listener.onApplicationEvent(event);

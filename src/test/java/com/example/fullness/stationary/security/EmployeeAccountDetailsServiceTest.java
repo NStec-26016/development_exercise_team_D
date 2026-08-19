@@ -14,7 +14,6 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 
 import com.example.fullness.stationary.entity.EmployeeAccount;
 import com.example.fullness.stationary.repository.EmployeeAccountRepository;
-import com.example.fullness.stationary.security.EmployeeAccountDetailsService;
 
 @ExtendWith(MockitoExtension.class)
 class EmployeeAccountDetailsServiceTest {
@@ -29,7 +28,7 @@ class EmployeeAccountDetailsServiceTest {
     @DisplayName("存在するユーザー名を指定した場合、その人の情報が正しく返却されること")
     void testloadUserByUsername_success() {
         // [1] テストデータの準備
-        String username = "丸ちゃん";
+        String username = "marumoto";
         EmployeeAccount mockAccount = new EmployeeAccount();
 
         // [2] モックの動作定義（Repositoryが指定した名前で呼ばれたら、mockAccountを返す）

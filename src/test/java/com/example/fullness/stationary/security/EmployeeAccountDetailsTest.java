@@ -8,7 +8,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.core.GrantedAuthority;
 
 import com.example.fullness.stationary.entity.EmployeeAccount;
-import com.example.fullness.stationary.security.EmployeeAccountDetails;
 
 import java.time.LocalDateTime;
 import java.util.Collection;
@@ -46,16 +45,16 @@ public class EmployeeAccountDetailsTest {
     void testGettersAndBasicProperties() {
         // 【1. 準備 】検証用のテストデータをセットした本物のエンティティを用意
         EmployeeAccount account = new EmployeeAccount();
-        account.setName("丸ちゃん");
-        account.setPassword("encodedPassword123");
+        account.setName("marumoto");
+        account.setPassword("maru1");
 
         // テスト対象クラスをインスタンス化（コンスタラクタにデータを渡す）
         EmployeeAccountDetails details = new EmployeeAccountDetails(account, authorities);
 
         // 【2. 実行 ＆ 3. 検証 】
         // メソッドがエンティティに格納した通りの値を返すか答え合わせ
-        assertEquals("丸ちゃん", details.getUsername());
-        assertEquals("encodedPassword123", details.getPassword());
+        assertEquals("marumoto", details.getUsername());
+        assertEquals("maru1", details.getPassword());
         assertEquals(authorities, details.getAuthorities());
     }
 

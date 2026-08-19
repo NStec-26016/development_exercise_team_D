@@ -2,7 +2,6 @@ package com.example.fullness.stationary.security.listener;
 
 import com.example.fullness.stationary.entity.EmployeeAccount;
 import com.example.fullness.stationary.repository.EmployeeAccountRepository;
-import com.example.fullness.stationary.security.listener.AuthenticationFailureListener;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -61,7 +60,7 @@ public class AuthenticationFailureListenerTest {
     /**
      * テストで使用する検証用のユーザー名です。
      */
-    private final String testName = "丸ちゃん";
+    private final String testName = "marumoto";
 
     /**
      * 各テストメソッド（{@code @Test}）が実行される直前に、必ず毎回呼び出される前処理メソッドです。
@@ -92,12 +91,12 @@ public class AuthenticationFailureListenerTest {
     void testOnApplicationEvent_CountUpWithoutLockd() {
         // 【1. 準備 (Given)】現在、過去の失敗回数が「2回」のアカウントを作成
         EmployeeAccount account = new EmployeeAccount();
-        account.setName("丸ちゃん");
+        account.setName("marumoto");
         account.setFailedAttempts(2);
         account.setLockTime(null);
 
         // リポジトリに「"丸ちゃん"を探されたら、この2回失敗しているアカウントを返しなさい」と設定
-        when(employeeAccountRepository.findByName("丸ちゃん")).thenReturn(account);
+        when(employeeAccountRepository.findByName("marumoto")).thenReturn(account);
 
         // 【2. 実行 (When)】テスト対象メソッドを呼び出します（パスワード間違いが発生したと仮定）
         listener.onApplicationEvent(event);
@@ -126,12 +125,12 @@ public class AuthenticationFailureListenerTest {
     void testOnApplicationEvent_LockWhenReachedFived() {
         // 【1. 準備 (Given)】あと1回でアウトとなる、過去の失敗回数が「4回」のアカウントを作成
         EmployeeAccount account = new EmployeeAccount();
-        account.setName("丸ちゃん");
+        account.setName("marumoto");
         account.setFailedAttempts(4);
         account.setLockTime(null);
 
         // リポジトリに「"丸ちゃん"を探されたら、この4回失敗しているアカウントを返しなさい」と設定
-        when(employeeAccountRepository.findByName("丸ちゃん")).thenReturn(account);
+        when(employeeAccountRepository.findByName("marumoto")).thenReturn(account);
 
         // 【2. 実行 (When)】ログイン失敗イベントを発生させます（5回目のミス）
         listener.onApplicationEvent(event);
@@ -158,7 +157,7 @@ public class AuthenticationFailureListenerTest {
     @DisplayName("ユーザーがデータベースに存在しない場合、何も処理を行わず安全に終了すること")
     void testOnApplicationEvent_UserNotFound() {
         // 【1. 準備 (Given)】リポジトリに「"丸ちゃん"を探されても、null（そんな人はいない）を返しなさい」と設定
-        when(employeeAccountRepository.findByName("丸ちゃん")).thenReturn(null);
+        when(employeeAccountRepository.findByName("marumoto")).thenReturn(null);
 
         // 【2. 実行 ＆ 検証 (When & Then)】
         // メソッドを実行しても、途中でエラーにならずに安全に終了できるかテスト
