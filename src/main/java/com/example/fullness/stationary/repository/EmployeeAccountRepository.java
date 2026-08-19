@@ -33,4 +33,7 @@ public interface EmployeeAccountRepository {
 
     // UC09 担当者アカウント登録
     int insertEmployeeAccount(EmployeeAccount employeeAccount);
+
+    // ⬇️【あなたが新しく追記する1行】アカウント名の重複件数を数えるメソッド
+    int countByName(@Param("name") String name);
 }

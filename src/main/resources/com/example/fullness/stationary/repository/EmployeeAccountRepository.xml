@@ -3,7 +3,7 @@
 <mapper namespace="com.example.fullness.stationary.repository.EmployeeAccountRepository">
 
     <!-- 【UC17 担当者ログイン用】アカウント単体（パスワード照合用）のマッピング -->
-    <resultMap id="EmployeeAccountResult" type="com.example.fullness.stationary.entity.EmployeeAccount">
+    
         <id property="id" column="id" /> 
         <result property="employeeId" column="employee_id" /> 
         <result property="name" column="name" /> 
@@ -26,7 +26,7 @@
     </select>
 
     <!-- ログイン失敗回数とロック日時の更新用SQL -->
-    <update id="updateLockStatus" parameterType="com.example.fullness.stationary.entity.EmployeeAccount">
+    
         UPDATE employee_account
         SET 
             failed_attempts = #{failedAttempts},
@@ -34,5 +34,35 @@
         WHERE 
             name = #{name}
     </update>
+
+
+    <!-- ==================================================================== -->
+    <!-- 🔽 ここから下が、アカウント登録（UC09）のために新しく「追記」したSQL 🔽 -->
+    <!-- ==================================================================== -->
+
+    <!-- 1. アカウント名の重複チェック用SQL -->
+    <select id="countByName" resultType="int">
+        SELECT COUNT(*)
+        FROM employee_account
+        WHERE name = #{name}
+    </select>
+
+    <!-- 2. 担当者アカウント新規登録用SQL -->
+    <!-- XMLのマッピングにより、Javaオブジェクトのフィールド名（camelCase）が、DBのカラム名（snake_case）へ正しく変換されて挿入されます -->
+    
+        INSERT INTO employee_account (
+            employee_id,
+            name,
+            password,
+            failed_attempts,
+            lock_time
+        ) VALUES (
+            #{employeeId},
+            #{name},
+            #{password},
+            #{failedAttempts},
+            #{lockTime}
+        )
+    </insert>
 
 </mapper>
