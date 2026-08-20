@@ -55,7 +55,6 @@ public class AccountRegisterController {
     public String validateForm(@Validated @ModelAttribute("form") AccountRegisterForm form,
             BindingResult result, Model model) {
 
-        // ポストされた直後に、選択されたIDから名前をDB取得してセットする
         if (form.getEmployeeId() != null && !form.getEmployeeId().trim().isEmpty()) {
             String empName = accountRegisterService.getEmployeeNameById(form.getEmployeeId());
             form.setEmployeeName(empName);
@@ -69,7 +68,6 @@ public class AccountRegisterController {
             }
         }
 
-        // アカウント名重複チェック
         if (!result.hasFieldErrors("accountName") && form.getAccountName() != null
                 && !form.getAccountName().trim().isEmpty()) {
             if (accountRegisterService.isAccountNameDuplicate(form.getAccountName())) {
@@ -77,7 +75,6 @@ public class AccountRegisterController {
             }
         }
 
-        // エラーがあれば入力画面へ戻す
         if (!errorMessages.isEmpty()) {
             model.addAttribute("errorMessages", errorMessages);
             model.addAttribute("employees", accountRegisterService.getUnregisteredEmployees());
@@ -92,16 +89,15 @@ public class AccountRegisterController {
      * 2. 担当者アカウント登録(確認)画面の表示 (BP004)
      */
     @GetMapping("/confirm")
-    public String showConfirm(Model model, @ModelAttribute("form") AccountRegisterForm form,
-            RedirectAttributes redirectAttributes) {
+    public String showConfirm(Model model, @ModelAttribute("form") AccountRegisterForm form) {
 
-        if (form.getAccountName() == null || form.getAccountName().trim().isEmpty() || form.getEmployeeId() == null || form.getEmployeeId().trim().isEmpty()) {
-            List<String> errors = List.of("セッションが切れました。再度入力してください");
-            redirectAttributes.addFlashAttribute("errorMessages", errors);
-            return "redirect:/admin/account/form";
+        // 💡 修正点：セッションタイムアウト時の「入力画面へのリダイレクト」を仕様書通りに削除しました。
+        // 代わりに、システム例外をスローして共通エラー画面（500）にハンドリングさせます。
+        if (form.getAccountName() == null || form.getAccountName().trim().isEmpty() || form.getEmployeeId() == null
+                || form.getEmployeeId().trim().isEmpty()) {
+            throw new IllegalStateException("セッションタイムアウトが発生しました。");
         }
 
-        // 💡 修正箇所：Thymeleaf(確認画面)が ${form.employeeName} 等を認識できるよう、セッションから受け取ったデータをModelに詰め直します
         model.addAttribute("form", form);
         return "admin/account/confirm";
     }
@@ -125,10 +121,7 @@ public class AccountRegisterController {
                     return "redirect:/admin/account/form";
                 }
 
-                // 登録実行
                 accountRegisterService.register(form);
-
-                // 💡 修正箇所：完了画面（complete.html）に社員名を引き継ぐために明示的に載せる
                 redirectAttributes.addFlashAttribute("form", form);
 
                 return "redirect:/admin/account/complete";
@@ -148,14 +141,9 @@ public class AccountRegisterController {
      */
     @GetMapping("/complete")
     public String showComplete(Model model, @ModelAttribute("form") AccountRegisterForm form) {
-        
-        // 💡 修正箇所：FlashAttributeの引き継ぎデータ、またはセッション内のデータをチェック
-        if (form.getAccountName() == null || form.getAccountName().trim().isEmpty()) {
-            logger.warn("不正アクセス検知: 完了画面への直接アクセスを遮断しました。");
-            return "redirect:/admin";
-        }
-        
-        // 💡 修正箇所：Thymeleaf(完了画面)が確実に ${form.employeeName} やアカウント名を認識できるようにModelに設定
+        // 💡 修正点：不正アクセスのガード行（if文でのリダイレクト）を仕様書通りに「すべて削除」しました。
+        // これにより直接アクセスやリロード時も、エラーにならず完了画面の表示を維持・試行します。
+
         model.addAttribute("form", form);
         return "admin/account/complete";
     }
