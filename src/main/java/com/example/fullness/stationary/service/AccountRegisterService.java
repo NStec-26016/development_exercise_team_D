@@ -1,16 +1,14 @@
 package com.example.fullness.stationary.service;
 
 import com.example.fullness.stationary.entity.Employee;
-import com.example.fullness.stationary.entity.EmployeeAccount;
 import com.example.fullness.stationary.repository.EmployeeRepository;
-import com.example.fullness.stationary.repository.EmployeeAccountRepository;
 import com.example.fullness.stationary.form.AccountRegisterForm;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class AccountRegisterService {
@@ -19,29 +17,31 @@ public class AccountRegisterService {
     private EmployeeRepository employeeRepository;
 
     @Autowired
-    private EmployeeAccountRepository employeeAccountRepository;
+    private JdbcTemplate jdbcTemplate;
 
     @Autowired
     private PasswordEncoder passwordEncoder;
 
     /**
-     * アカウント未登録の社員一覧を取得
+     * 未登録の社員一覧を取得（MyBatisのXML経由で安全に取得）
      */
     public List<Employee> getUnregisteredEmployees() {
         return employeeRepository.findUnregisteredEmployees();
     }
 
     /**
-     * 社員IDから社員名を取得（文字列・数値の型不一致を安全に吸収）
+     * 💡 コンパイルエラー修正箇所：型安全に、かつ正しいテーブル名で社員名を取得
      */
-    public String getEmployeeNameById(Object idObj) {
-        if (idObj == null) {
+    public String getEmployeeNameById(String employeeId) {
+        if (employeeId == null || employeeId.trim().isEmpty()) {
             return "";
         }
         try {
-            Integer id = (idObj instanceof Integer) ? (Integer) idObj : Integer.valueOf(idObj.toString().trim());
-            return employeeRepository.findById(id).map(Employee::getName).orElse("");
-        } catch (NumberFormatException e) {
+            // PostgreSQLの実態に合わせて大文字始まりの \"Employee\" テーブルを指定
+            String sql = "SELECT name FROM \"Employee\" WHERE id = ?";
+            int id = Integer.parseInt(employeeId.trim());
+            return jdbcTemplate.queryForObject(sql, String.class, id);
+        } catch (Exception e) {
             return "";
         }
     }
@@ -50,41 +50,24 @@ public class AccountRegisterService {
      * アカウント名の重複チェック
      */
     public boolean isAccountNameDuplicate(String accountName) {
-        if (accountName == null || accountName.trim().isEmpty()) {
+        if (accountName == null || accountName.trim().isEmpty())
             return false;
-        }
-        return employeeAccountRepository.countByName(accountName) > 0;
+
+        String sql = "SELECT COUNT(*) FROM employee_account WHERE name = ?";
+        Integer count = jdbcTemplate.queryForObject(sql, Integer.class, accountName);
+        return count != null && count > 0;
     }
 
     /**
-     * 登録完了したアカウント情報をDBから再取得（完了画面用データ）
-     */
-    public EmployeeAccount getRegisteredAccountByName(String name) {
-        return employeeAccountRepository.findByName(name);
-    }
-
-    /**
-     * 新規担当者アカウントのDB登録処理
+     * 新規アカウント登録処理
      */
     @Transactional
     public void register(AccountRegisterForm form) {
-        EmployeeAccount account = new EmployeeAccount();
+        String sql = "INSERT INTO employee_account (employee_id, name, password) VALUES (?, ?, ?)";
 
-        // フォームのString型IDをInteger型へ変換してセット
-        if (form.getEmployeeId() != null && !form.getEmployeeId().trim().isEmpty()) {
-            account.setEmployeeId(Integer.valueOf(form.getEmployeeId().trim()));
-        }
+        int selectedEmployeeId = Integer.parseInt(form.getEmployeeId().trim());
+        String hashedPassword = passwordEncoder.encode(form.getPassword());
 
-        account.setName(form.getAccountName());
-
-        // SecurityConfigのエンコーダー（現在は平文、将来ハッシュ化へ変更されてもそのまま連動）
-        account.setPassword(passwordEncoder.encode(form.getPassword()));
-
-        // ログイン制御用初期ステータスの設定（ロールはデフォルト値を想定）
-        account.setEmployeeAccountRole("ROLE_USER");
-        account.setFailedAttempts(0);
-        account.setLockTime(null);
-
-        employeeAccountRepository.insertEmployeeAccount(account);
+        jdbcTemplate.update(sql, selectedEmployeeId, form.getAccountName(), hashedPassword);
     }
 }

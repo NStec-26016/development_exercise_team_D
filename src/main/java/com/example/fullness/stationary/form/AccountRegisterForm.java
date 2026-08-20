@@ -11,20 +11,20 @@ public class AccountRegisterForm implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    // 社員選択（必須チェック）
+    // ［社員名］必須選択仕様
     @NotBlank(message = "社員名を選択してください")
     private String employeeId;
 
-    // 画面表示・保持用の社員名
+    // 💡 配布されている確認画面(confirm.html)や完了画面が求めている「社員名表示用フィールド」を復活
     private String employeeName;
 
-    // アカウント名（必須、5〜20文字、半角英数字）
+    // ［アカウント名］必須、5～20文字、半角英数字
     @NotBlank(message = "アカウント名を入力してください")
     @Size(min = 5, max = 20, message = "アカウント名は5～20文字で入力してください")
     @Pattern(regexp = "^[a-zA-Z0-9]+$", message = "アカウント名は半角英数字で入力してください")
     private String accountName;
 
-    // パスワード（必須、5〜20文字、半角英数字）
+    // ［パスワード］必須、5～20文字、半角英数字
     @NotBlank(message = "パスワードを入力してください")
     @Size(min = 5, max = 20, message = "パスワードは5～20文字で入力してください")
     @Pattern(regexp = "^[a-zA-Z0-9]+$", message = "パスワードは半角英数字で入力してください")
