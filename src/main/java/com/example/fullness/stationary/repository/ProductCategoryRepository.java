@@ -4,6 +4,8 @@ import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
 
+import com.example.fullness.stationary.entity.ProductCategory;
+
 @Mapper
 @Repository
 public interface ProductCategoryRepository {
@@ -15,5 +17,7 @@ public interface ProductCategoryRepository {
      * @param name 登録するカテゴリ名
      */
     void insertCategory(@Param("name") String name);
+
+    ProductCategory findByName(@Param("name") String name);// 既に登録されているカテゴリーを検索するメソッド
 
 }

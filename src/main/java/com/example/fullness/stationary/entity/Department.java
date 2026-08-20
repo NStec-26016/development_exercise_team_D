@@ -9,5 +9,5 @@ public class Department implements Serializable {
 
     private Integer id;
 
-    private String Name;
+    private String name;
 }

@@ -13,4 +13,19 @@
         )
     </insert>
 
+    <resultMap id="ProductCategoryResult" type="com.example.fullness.stationary.entity.ProductCategory">
+        <id property="id" column="id" /> 
+        <result property="name" column="name" /> 
+    </resultMap>
+
+    <select id="findByName" resultMap="ProductCategoryResult">
+     SELECT 
+            id, 
+            name 
+        FROM 
+            product_category 
+        WHERE 
+            name = #{name}
+    </select>
+
 </mapper>
