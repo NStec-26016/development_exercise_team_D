@@ -11,5 +11,5 @@ public class FullnessStationaryApplication {
 	public static void main(String[] args) {
 		SpringApplication.run(FullnessStationaryApplication.class, args);
 	}
-
+     
 }

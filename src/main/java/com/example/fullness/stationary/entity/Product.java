@@ -1,20 +1,15 @@
 package com.example.fullness.stationary.entity;
 
 import java.io.Serializable;
-
+import java.math.BigDecimal;
 import lombok.Data;
+
 @Data
 public class Product implements Serializable {
     private Integer id;
-
-    private Integer product_category_id;
-
     private String name;
-
-    private Integer price;
-
-    private String image_url;
-
-    private Integer delete_flag;
-
+    private BigDecimal price;
+    private String imagePath;
+    private Integer categoryId;
+    private Integer stock; // ★ 追加
 }
