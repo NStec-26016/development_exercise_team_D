@@ -38,7 +38,7 @@ class ProductServiceTest {
     }
 
     @Test
-    void カテゴリ一覧が正常に取得できること() {
+    void testFindfindAllCategories_OK() {
         // 準備
         List<Category> mockCategories = Arrays.asList(new Category(), new Category());
         when(categoryRepository.findAllByOrderByCategoryIdAsc()).thenReturn(mockCategories);
@@ -53,7 +53,7 @@ class ProductServiceTest {
     }
 
     @Test
-    void カテゴリIDがnullのときに全商品がページング取得できること() {
+    void testFindfindProductsByCategory_OK() {
         // 準備
         Pageable pageable = PageRequest.of(0, 10);
         List<Product> mockProducts = Arrays.asList(new Product(), new Product());
@@ -72,7 +72,7 @@ class ProductServiceTest {
     }
 
     @Test
-    void カテゴリID指定時に該当する商品がページング取得できること() {
+    void testFindfindProductsByCategory_OK2() {
         // 準備
         Integer categoryId = 1;
         Pageable pageable = PageRequest.of(0, 10);

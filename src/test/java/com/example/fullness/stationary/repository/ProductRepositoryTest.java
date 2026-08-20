@@ -19,14 +19,14 @@ class ProductRepositoryTest {
     private ProductRepository productRepository;
 
     @Test
-    void 全件カウントが正しく取得できること() {
+    void testFindAllWithPaging_OK() {
         long count = productRepository.countAll();
         // 初期データが3件入っている前提であれば 3 以上、または 0件以上であることを検証
         assertTrue(count >= 0);
     }
 
     @Test
-    void ページング付き全件取得ができること() {
+    void testFindfindByCategoryIdWithPaging_OK() {
         // limit = 10, offset = 0 で取得
         List<Product> products = productRepository.findAllWithPaging(10, 0);
         assertNotNull(products);
