@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org">
+<mapper namespace="com.example.fullness.stationary.repository.EmployeeRepository">
+
+    
+        <id property="id" column="id" />
+        <result property="departmentId" column="department_id" />
+        <result property="name" column="name" />
+        <result property="nameKana" column="name_kana" />
+        <result property="password" column="password" />
+    </resultMap>
+
+    <!-- アカウント未作成の社員のみを社員IDの昇順（ASC）で取得 -->
+    <select id="findUnregisteredEmployees" resultMap="EmployeeResultMap">
+        SELECT e.* 
+        FROM employees e 
+        LEFT JOIN employee_account a ON e.id = a.employee_id 
+        WHERE a.employee_id IS NULL
+        ORDER BY e.id ASC
+    </select>
+
+    <!-- 主キーで社員情報を1件検索 -->
+    <select id="findById" resultMap="EmployeeResultMap">
+        SELECT * 
+        FROM employees 
+        WHERE id = #{id}
+    </select>
+
+</mapper>

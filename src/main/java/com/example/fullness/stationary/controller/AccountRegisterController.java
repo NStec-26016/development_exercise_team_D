@@ -1,6 +1,7 @@
 package com.example.fullness.stationary.controller;
 
 import com.example.fullness.stationary.form.AccountRegisterForm;
+import com.example.fullness.stationary.entity.EmployeeAccount;
 import com.example.fullness.stationary.service.AccountRegisterService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,7 +20,7 @@ import java.util.List;
 
 @Controller
 @RequestMapping("/admin/account")
-@SessionAttributes("form") // 配布HTMLの `${form.xxx}` とセッションを連動させる
+@SessionAttributes("form")
 public class AccountRegisterController {
 
     private static final Logger logger = LoggerFactory.getLogger(AccountRegisterController.class);
@@ -27,41 +28,43 @@ public class AccountRegisterController {
     @Autowired
     private AccountRegisterService accountRegisterService;
 
-    /**
-     * セッション上のフォームオブジェクトの初期化
-     */
     @ModelAttribute("form")
     public AccountRegisterForm setUpForm() {
         return new AccountRegisterForm();
     }
 
     /**
-     * 1. 担当者アカウント登録(入力)画面の表示
+     * 1. 担当者アカウント登録(入力)画面の表示 (BP003)
      * URL: /admin/account/form (GET)
      */
     @GetMapping("/form")
     public String showForm(Model model, @ModelAttribute("form") AccountRegisterForm form) {
         try {
-            // 配布HTMLの ${employees} に合わせて、アカウント未登録の社員リストをModelに格納
-            model.addAttribute("employees", accountRegisterService.getUnregisteredEmployees());
+            // 未登録の社員情報を取得
+            var unregisteredEmployees = accountRegisterService.getUnregisteredEmployees();
+            model.addAttribute("employees", unregisteredEmployees);
 
-            // 【変更点の反映】「未登録社員なし」でもボタン非活性化フラグは送信しない（仕様削除のため）
-            if (accountRegisterService.getUnregisteredEmployees().isEmpty()) {
+            // ［例外処理仕様］未登録社員なし
+            if (unregisteredEmployees.isEmpty()) {
                 List<String> errors = new ArrayList<>();
                 errors.add("アカウント登録可能な社員が存在しません");
                 model.addAttribute("errorMessages", errors);
+                // ※配布HTMLには確認ボタンを非活性化する th:disabled は付いていないため、
+                // 上部エラーメッセージ表示で仕様を満たします
             }
         } catch (Exception e) {
-            logger.error("社員情報の取得に失敗しました", e);
+            // ［例外処理仕様］社員データ取得エラー
+            logger.error("社員情報の取得に失敗しました。詳細: ", e);
             List<String> errors = new ArrayList<>();
             errors.add("社員情報の取得に失敗しました");
             model.addAttribute("errorMessages", errors);
+            model.addAttribute("employees", new ArrayList<>());
         }
-        return "admin/account/form"; // templates/admin/account/form.html を呼び出す
+        return "admin/account/form";
     }
 
     /**
-     * 1.5 入力画面からのポスト処理（完了ボタン押下時）
+     * 1.5 完了ボタン押下時のポスト処理
      * URL: /admin/account/form (POST)
      */
     @PostMapping("/form")
@@ -70,28 +73,35 @@ public class AccountRegisterController {
 
         List<String> errorMessages = new ArrayList<>();
 
-        // 必須入力や文字数・文字種（半角英数字）のバリデーションエラーをリストに詰める
+        // 1. 単体バリデーション（必須、文字数、半角英数字）のエラーをリストに詰め替える
         if (result.hasErrors()) {
             for (ObjectError error : result.getAllErrors()) {
                 errorMessages.add(error.getDefaultMessage());
             }
         }
 
-        // アカウント名重複チェック（入力がある場合のみ実行）
-        if (form.getAccountName() != null && !form.getAccountName().isEmpty()) {
+        // 2. アカウント名重複チェック（単体エラーがなく、入力がある場合のみ実行）
+        if (!result.hasFieldErrors("accountName") && form.getAccountName() != null
+                && !form.getAccountName().trim().isEmpty()) {
             if (accountRegisterService.isAccountNameDuplicate(form.getAccountName())) {
                 errorMessages.add("このアカウント名は既に使用されています");
             }
         }
 
-        // 1つでもエラーがあれば、エラーメッセージリストを保持して入力画面を再表示
+        // 3. 1つでもエラーがあれば、エラーリストを画面に渡して入力画面を再表示
         if (!errorMessages.isEmpty()) {
+            try {
+                // 再表示用に選択肢を再取得
+                model.addAttribute("employees", accountRegisterService.getUnregisteredEmployees());
+            } catch (Exception e) {
+                logger.error("再表示時の社員情報取得に失敗しました", e);
+            }
+            // 配布HTMLの仕様「th:if="${errorMessages}"」に合わせてモデルに格納
             model.addAttribute("errorMessages", errorMessages);
-            // 選択肢の再セットが必要なため、showFormメソッドを内部呼び出しして画面を返す
-            return showForm(model, form);
+            return "admin/account/form";
         }
 
-        // 確認画面・完了画面の表示用に、選択されたIDから社員名を取得してFormにセット
+        // 4. エラーがない場合、選択されたIDから社員名を取得して確認画面用に保存
         if (form.getEmployeeId() != null) {
             String empName = accountRegisterService.getEmployeeNameById(form.getEmployeeId());
             form.setEmployeeName(empName);
@@ -101,40 +111,39 @@ public class AccountRegisterController {
     }
 
     /**
-     * 2. 担当者担当者アカウント登録(確認)画面の表示
+     * 2. 担当者アカウント登録(確認)画面の表示 (BP004)
      * URL: /admin/account/confirm (GET)
      */
     @GetMapping("/confirm")
-    public String showConfirm(@ModelAttribute("form") AccountRegisterForm form, Model model) {
-        // セッションタイムアウトや不正な直接アクセスでデータが空の場合
-        if (form.getAccountName() == null || form.getAccountName().isEmpty()) {
+    public String showConfirm(@ModelAttribute("form") AccountRegisterForm form,
+            RedirectAttributes redirectAttributes) {
+
+        // セッションタイムアウト・不正アクセスガード
+        if (form.getAccountName() == null || form.getAccountName().trim().isEmpty() || form.getEmployeeId() == null) {
             List<String> errors = new ArrayList<>();
-            errors.add("セッションが切れました。再度入力してください");
-            model.addAttribute("errorMessages", errors);
-            // 【変更点の反映】タイムアウト時の一律入力画面リダイレクト仕様は削除されたが、
-            // 安全のためメッセージを保持して入力画面へ転送（forward）する形に留める
-            return "forward:/admin/account/form";
+            errors.add("セッションが切れました。再度入力してください（入力情報が見つかりません。再度入力してください）");
+            redirectAttributes.addFlashAttribute("errorMessages", errors);
+            return "redirect:/admin/account/form";
         }
-        return "admin/account/confirm"; // templates/admin/account/confirm.html を呼び出す
+
+        return "admin/account/confirm";
     }
 
     /**
-     * 2.5 確認画面からのポスト処理（戻るボタン、または登録ボタン押下時）
+     * 2.5 確認画面からのポスト処理
      * URL: /admin/account/confirm (POST)
      */
     @PostMapping("/confirm")
     public String handleConfirmAction(@ModelAttribute("form") AccountRegisterForm form,
             @RequestParam("action") String action,
-            RedirectAttributes redirectAttributes,
-            Model model) {
+            RedirectAttributes redirectAttributes) {
 
-        // 配布HTMLの name="action" value="back" （戻るボタン）が押された場合
+        // [戻る]ボタン押下時
         if ("back".equals(action)) {
-            // セッションに値を残したまま入力画面へリダイレクト
             return "redirect:/admin/account/form";
         }
 
-        // 配布HTMLの name="action" value="register" （登録ボタン）が押された場合
+        // [登録]ボタン押下時
         if ("register".equals(action)) {
             try {
                 // 登録直前の競合対策（最終重複チェック）
@@ -145,13 +154,13 @@ public class AccountRegisterController {
                     return "redirect:/admin/account/form";
                 }
 
-                // Service層でパスワードハッシュ化とDB登録を実行
+                // 登録処理実行（パスワードの暗号化はService層でNoOpPasswordEncoderを自動使用）
                 accountRegisterService.register(form);
-
                 return "redirect:/admin/account/complete";
 
             } catch (Exception e) {
-                logger.error("登録処理に失敗しました。管理者に連絡してください", e);
+                // ［例外処理仕様］DB登録エラー
+                logger.error("登録処理に失敗しました。詳細エラー: ", e);
                 List<String> errors = new ArrayList<>();
                 errors.add("登録処理に失敗しました。管理者に連絡してください");
                 redirectAttributes.addFlashAttribute("errorMessages", errors);
@@ -163,25 +172,20 @@ public class AccountRegisterController {
     }
 
     /**
-     * 3. 担当者アカウント登録(完了)画面の表示
+     * 3. 担当者アカウント登録(完了)画面の表示 (BP005)
      * URL: /admin/account/complete (GET)
      */
     @GetMapping("/complete")
     public String showComplete(@ModelAttribute("form") AccountRegisterForm form, SessionStatus sessionStatus) {
 
-        // 【変更点の反映】セッションデータ不足（データが空）の場合
-        if (form.getAccountName() == null || form.getAccountName().isEmpty()) {
-            // 変更前：トップ画面（FP001）へリダイレクト ➔ 変更後：メニュー画面（BP001）へリダイレクト
-            // 【結合時の修正ポイント】配布HTMLのメニューへボタンに合わせて「/admin」にリダイレクトさせています。
-            // ログインシステム側のメニュー画面のURLが異なる場合は、ここを書き換えてください。
-            return "redirect:/admin";
+        // 不正アクセス・セッションデータ不足ガード
+        if (form.getAccountName() == null || form.getAccountName().trim().isEmpty() || form.getEmployeeName() == null) {
+            logger.warn("不正アクセスまたはセッション切れによる完了画面への直接アクセスを遮断しました。");
+            return "redirect:/admin"; // 仕様に基づき、全員アクセス可能なメニュー画面へリダイレクト
         }
 
-        // 【変更点の反映】不正アクセス時にエラー画面(FP000)へ飛ばすガードロジック行はすべて削除
-
-        // 完了画面の表示が終わるタイミングでセッションをクリーンアップ
-        sessionStatus.setComplete();
-
-        return "admin/account/complete"; // templates/admin/account/complete.html を呼び出す
+        // 💡 complete.html が画面を描画する（th:text="|${form.employeeName}...|）ためにセッションが必要なため、
+        // 完了画面から「メニューへ」または「入力に戻る」で離脱したタイミング、もしくは次回のフォーム初期化時にクリアさせます。
+        return "admin/account/complete";
     }
 }

@@ -2,15 +2,15 @@ package com.example.fullness.stationary.service;
 
 import com.example.fullness.stationary.entity.Employee;
 import com.example.fullness.stationary.entity.EmployeeAccount;
-import com.example.fullness.stationary.form.AccountRegisterForm;
-import com.example.fullness.stationary.repository.EmployeeAccountRepository;
 import com.example.fullness.stationary.repository.EmployeeRepository;
+import com.example.fullness.stationary.repository.EmployeeAccountRepository;
+import com.example.fullness.stationary.form.AccountRegisterForm;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class AccountRegisterService {
@@ -25,53 +25,66 @@ public class AccountRegisterService {
     private PasswordEncoder passwordEncoder;
 
     /**
-     * アカウントが未登録の社員リストをDBから取得
+     * アカウント未登録の社員一覧を取得
      */
     public List<Employee> getUnregisteredEmployees() {
         return employeeRepository.findUnregisteredEmployees();
     }
 
     /**
-     * 社員IDから社員名を取得
+     * 社員IDから社員名を取得（文字列・数値の型不一致を安全に吸収）
      */
-    public String getEmployeeNameById(String id) {
-        if (id == null || id.isEmpty()) {
-            return "未選択";
+    public String getEmployeeNameById(Object idObj) {
+        if (idObj == null) {
+            return "";
         }
-        Employee employee = employeeRepository.findById(Integer.valueOf(id));
-        return (employee != null) ? employee.getName() : "未選択";
+        try {
+            Integer id = (idObj instanceof Integer) ? (Integer) idObj : Integer.valueOf(idObj.toString().trim());
+            return employeeRepository.findById(id).map(Employee::getName).orElse("");
+        } catch (NumberFormatException e) {
+            return "";
+        }
     }
 
     /**
      * アカウント名の重複チェック
      */
     public boolean isAccountNameDuplicate(String accountName) {
-        // ログイン側のRepositoryに追記した countByName を呼び出す
-        int count = employeeAccountRepository.countByName(accountName);
-        return count > 0;
+        if (accountName == null || accountName.trim().isEmpty()) {
+            return false;
+        }
+        return employeeAccountRepository.countByName(accountName) > 0;
     }
 
     /**
-     * アカウントの新規登録処理
+     * 登録完了したアカウント情報をDBから再取得（完了画面用データ）
+     */
+    public EmployeeAccount getRegisteredAccountByName(String name) {
+        return employeeAccountRepository.findByName(name);
+    }
+
+    /**
+     * 新規担当者アカウントのDB登録処理
      */
     @Transactional
     public void register(AccountRegisterForm form) {
-        // SecurityConfigの設定に連動（現在はNoOpのため生のまま、将来暗号化がONになれば自動で追従）
-        String processedPassword = passwordEncoder.encode(form.getPassword());
-
         EmployeeAccount account = new EmployeeAccount();
-        
-        // ログインシステム側のEntity定義（型・変数名）に完全適合
-        account.setEmployeeId(Integer.valueOf(form.getEmployeeId()));
+
+        // フォームのString型IDをInteger型へ変換してセット
+        if (form.getEmployeeId() != null && !form.getEmployeeId().trim().isEmpty()) {
+            account.setEmployeeId(Integer.valueOf(form.getEmployeeId().trim()));
+        }
+
         account.setName(form.getAccountName());
-        account.setPassword(processedPassword);
-        
-        // 演習ルールに合わせた初期値設定
-        account.setEmployeeAccountRole("ROLE_USER"); 
+
+        // SecurityConfigのエンコーダー（現在は平文、将来ハッシュ化へ変更されてもそのまま連動）
+        account.setPassword(passwordEncoder.encode(form.getPassword()));
+
+        // ログイン制御用初期ステータスの設定（ロールはデフォルト値を想定）
+        account.setEmployeeAccountRole("ROLE_USER");
         account.setFailedAttempts(0);
         account.setLockTime(null);
 
-        // ★ログイン側が事前に用意してくれていた本物の登録メソッドを呼び出す
         employeeAccountRepository.insertEmployeeAccount(account);
     }
 }
