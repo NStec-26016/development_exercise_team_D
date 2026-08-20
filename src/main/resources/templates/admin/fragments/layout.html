@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="ja" xmlns:th="http://www.thymeleaf.org">
+<body>
+
+<header th:fragment="header" class="admin-header py-3 mb-4">
+    <div class="container">
+        <div class="text-center mb-2">
+            <a th:href="@{/admin}" class="admin-title fs-4">フルネス文具 管理画面</a>
+        </div>
+        <nav class="d-flex justify-content-center align-items-center gap-4 flex-wrap" th:if="${loggedIn}">
+            <a th:href="@{/admin/product}" class="nav-link">商品情報メンテナンス</a>
+            <a th:href="@{/admin/category/add}" class="nav-link">商品カテゴリ登録</a>
+            <a th:href="@{/admin/order/search}" class="nav-link">購入履歴検索</a>
+            <a th:href="@{/admin/account/form}" class="nav-link">アカウント登録</a>
+            <form th:action="@{/admin/logout}" method="post" class="mb-0">
+                <button type="submit" class="btn btn-fs btn-sm">ログアウト</button>
+            </form>
+        </nav>
+        <nav class="d-flex justify-content-center" th:unless="${loggedIn}">
+            <a th:href="@{/admin/login}" class="btn btn-fs btn-sm">ログイン</a>
+        </nav>
+    </div>
+</header>
+
+<footer th:fragment="footer" class="admin-footer py-3 mt-5 text-center">
+    Fullness Stationery
+</footer>
+
+</body>
+</html>
