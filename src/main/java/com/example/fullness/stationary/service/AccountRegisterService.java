@@ -30,15 +30,15 @@ public class AccountRegisterService {
     }
 
     /**
-     * 💡 コンパイルエラー修正箇所：型安全に、かつ正しいテーブル名で社員名を取得
+     * 社員IDから社員名を取得（実際の小文字テーブル名「employee」に修正）
      */
     public String getEmployeeNameById(String employeeId) {
         if (employeeId == null || employeeId.trim().isEmpty()) {
             return "";
         }
         try {
-            // PostgreSQLの実態に合わせて大文字始まりの \"Employee\" テーブルを指定
-            String sql = "SELECT name FROM \"Employee\" WHERE id = ?";
+            // 💡 修正箇所：\"Employee\" から、実態である全小文字の employee に修正しました
+            String sql = "SELECT name FROM employee WHERE id = ?";
             int id = Integer.parseInt(employeeId.trim());
             return jdbcTemplate.queryForObject(sql, String.class, id);
         } catch (Exception e) {

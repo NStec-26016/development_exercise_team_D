@@ -38,10 +38,7 @@ public class AccountRegisterController {
     @GetMapping("/form")
     public String showForm(Model model, @ModelAttribute("form") AccountRegisterForm form) {
         try {
-            // プルダウン用の未登録社員一覧をモデルに設定
             model.addAttribute("employees", accountRegisterService.getUnregisteredEmployees());
-            // 💡 配布HTMLの ${form.accountName}
-            // 等が初回アクセス時に「無い」と怒られて500エラーになるのを防ぐため、明示的にモデルに渡します
             model.addAttribute("form", form);
         } catch (Exception e) {
             logger.error("社員情報の取得に失敗しました。詳細: ", e);
@@ -57,6 +54,12 @@ public class AccountRegisterController {
     @PostMapping("/form")
     public String validateForm(@Validated @ModelAttribute("form") AccountRegisterForm form,
             BindingResult result, Model model) {
+
+        // ポストされた直後に、選択されたIDから名前をDB取得してセットする
+        if (form.getEmployeeId() != null && !form.getEmployeeId().trim().isEmpty()) {
+            String empName = accountRegisterService.getEmployeeNameById(form.getEmployeeId());
+            form.setEmployeeName(empName);
+        }
 
         List<String> errorMessages = new ArrayList<>();
 
@@ -74,18 +77,12 @@ public class AccountRegisterController {
             }
         }
 
-        /// エラーがあれば入力画面へ戻す
+        // エラーがあれば入力画面へ戻す
         if (!errorMessages.isEmpty()) {
             model.addAttribute("errorMessages", errorMessages);
             model.addAttribute("employees", accountRegisterService.getUnregisteredEmployees());
             model.addAttribute("form", form);
             return "admin/account/form";
-        }
-
-        // 💡 正常時に選択されたIDから「社員の名前」を取得してフォームに退避（これでconfirm.htmlの500エラーが消えます）
-        if (form.getEmployeeId() != null) {
-            String empName = accountRegisterService.getEmployeeNameById(form.getEmployeeId());
-            form.setEmployeeName(empName);
         }
 
         return "redirect:/admin/account/confirm";
@@ -95,16 +92,17 @@ public class AccountRegisterController {
      * 2. 担当者アカウント登録(確認)画面の表示 (BP004)
      */
     @GetMapping("/confirm")
-    public String showConfirm(@ModelAttribute("form") AccountRegisterForm form,
+    public String showConfirm(Model model, @ModelAttribute("form") AccountRegisterForm form,
             RedirectAttributes redirectAttributes) {
 
-        if (form.getAccountName() == null || form.getAccountName().trim().isEmpty() || form.getEmployeeId() == null
-                || form.getEmployeeId().trim().isEmpty()) {
+        if (form.getAccountName() == null || form.getAccountName().trim().isEmpty() || form.getEmployeeId() == null || form.getEmployeeId().trim().isEmpty()) {
             List<String> errors = List.of("セッションが切れました。再度入力してください");
             redirectAttributes.addFlashAttribute("errorMessages", errors);
             return "redirect:/admin/account/form";
         }
 
+        // 💡 修正箇所：Thymeleaf(確認画面)が ${form.employeeName} 等を認識できるよう、セッションから受け取ったデータをModelに詰め直します
+        model.addAttribute("form", form);
         return "admin/account/confirm";
     }
 
@@ -129,6 +127,10 @@ public class AccountRegisterController {
 
                 // 登録実行
                 accountRegisterService.register(form);
+
+                // 💡 修正箇所：完了画面（complete.html）に社員名を引き継ぐために明示的に載せる
+                redirectAttributes.addFlashAttribute("form", form);
+
                 return "redirect:/admin/account/complete";
 
             } catch (Exception e) {
@@ -145,11 +147,16 @@ public class AccountRegisterController {
      * 3. 担当者アカウント登録(完了)画面の表示 (BP005)
      */
     @GetMapping("/complete")
-    public String showComplete(@ModelAttribute("form") AccountRegisterForm form) {
+    public String showComplete(Model model, @ModelAttribute("form") AccountRegisterForm form) {
+        
+        // 💡 修正箇所：FlashAttributeの引き継ぎデータ、またはセッション内のデータをチェック
         if (form.getAccountName() == null || form.getAccountName().trim().isEmpty()) {
             logger.warn("不正アクセス検知: 完了画面への直接アクセスを遮断しました。");
             return "redirect:/admin";
         }
+        
+        // 💡 修正箇所：Thymeleaf(完了画面)が確実に ${form.employeeName} やアカウント名を認識できるようにModelに設定
+        model.addAttribute("form", form);
         return "admin/account/complete";
     }
 
