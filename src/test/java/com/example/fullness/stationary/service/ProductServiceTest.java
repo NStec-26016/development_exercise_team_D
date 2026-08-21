@@ -16,15 +16,15 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 
-import com.example.fullness.stationary.entity.Category;
+import com.example.fullness.stationary.entity.ProductCategory;
 import com.example.fullness.stationary.entity.Product;
-import com.example.fullness.stationary.repository.CategoryRepository;
+import com.example.fullness.stationary.repository.ProductCategoryRepository;
 import com.example.fullness.stationary.repository.ProductRepository;
 
 class ProductServiceTest {
 
     @Mock
-    private CategoryRepository categoryRepository;
+    private ProductCategoryRepository categoryRepository;
 
     @Mock
     private ProductRepository productRepository;
@@ -40,11 +40,11 @@ class ProductServiceTest {
     @Test
     void testFindfindAllCategories_OK() {
         // 準備
-        List<Category> mockCategories = Arrays.asList(new Category(), new Category());
+        List<ProductCategory> mockCategories = Arrays.asList(new ProductCategory(), new ProductCategory());
         when(categoryRepository.findAllByOrderByCategoryIdAsc()).thenReturn(mockCategories);
 
         // 実行
-        List<Category> result = productService.findAllCategories();
+        List<ProductCategory> result = productService.findAllCategories();
 
         // 検証
         assertNotNull(result);

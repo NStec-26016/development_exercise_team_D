@@ -1,6 +1,5 @@
 package com.example.fullness.stationary.controller;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,72 +10,153 @@ import org.springframework.validation.ObjectError;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.bind.support.SessionStatus;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+
+import com.example.fullness.stationary.entity.ProductCategory;
+import com.example.fullness.stationary.entity.ProductCategory;
 import com.example.fullness.stationary.form.ProductRegistrationForm;
+import com.example.fullness.stationary.repository.ProductCategoryRepository;
 import com.example.fullness.stationary.security.ProductRegistrationService;
 
 @Controller
-@RequestMapping("/admin/product")
+// 💡【共通URL】ご要望通り /admin/product/add をベースの階層にします
+@RequestMapping("/admin/product/add")
 @SessionAttributes("form")
 public class ProductRegistrationController {
 
     @Autowired
     private ProductRegistrationService productService;
 
+    @Autowired
+    private ProductCategoryRepository productCategoryRepository;
+
     @ModelAttribute("form")
     public ProductRegistrationForm setUpForm() {
-        return new ProductRegistrationForm();
+        ProductRegistrationForm form = new ProductRegistrationForm();
+        form.setImagePath("/images/Shop_Img1.jpeg"); // 画像nullクラッシュ防止
+        form.setCategoryName("");
+        form.setName("");
+        form.setCategoryId(0); // selected判定のnull安全対策
+        return form;
     }
 
-    /** 1️⃣ 入力画面表示 (GET /admin/product/add) */
-    @GetMapping("/add")
+    /**
+     * 1️⃣ ■ BP012 新商品登録(入力)画面を表示
+     * ✨URL: GET /admin/product/add
+     * クラスの共通URLの直下（空文字または "/"）にするため @GetMapping にしています
+     */
+    @GetMapping({ "", "/" })
     public String showAddForm(Model model) {
-        // 🛠️【修正：ピンクの枠を消す】通常時は null を渡すことで、HTML側の th:if が非表示（消去）と判定してくれます。
-        model.addAttribute("errorMessages", null);
-        model.addAttribute("categories", new ArrayList<>());
+        model.addAttribute("errorMessages", null); // 通常時はピンクのエラー枠を完全に消す
+
+        // データベースから本物のカテゴリ一覧を取得してHTMLに引き渡す
+        List<ProductCategory> categoryList = productCategoryRepository.findAllByOrderByCategoryIdAsc();
+        model.addAttribute("categories", categoryList);
+
         return "admin/product/add_form";
     }
 
-    /** 2️⃣ 確認画面へ遷移 (POST /admin/product/add) */
-    @PostMapping("/add")
+    /**
+     * 2️⃣ ■ BP013 新商品登録(確認)画面へのデータ処理
+     * ✨URL: POST /admin/product/add
+     * 入力画面のフォームからデータを受け取り、エラーがなければ確認画面URLへ「リダイレクト」します
+     */
+    @PostMapping({ "", "/" })
     public String confirmProduct(@Validated @ModelAttribute("form") ProductRegistrationForm form,
             BindingResult result, Model model) {
 
+        // 📸 【ここを修正しました！】画像のバリデーションチェック（必須を解除）
+        MultipartFile file = form.getImage();
+        // 💡 画像がアップロードされている場合のみ、形式のチェックを行います（空ならスルー）
+        if (file != null && !file.isEmpty()) {
+            String contentType = file.getContentType();
+            if (contentType == null || (!contentType.equals("image/jpeg") && !contentType.equals("image/png")
+                    && !contentType.equals("image/webp"))) {
+                result.rejectValue("image", "invalidFormat", "正しい画像形式でアップロードしてください");
+            }
+        }
+
+        // ⚠️ バリデーションエラー、または型変換エラーがある場合の処理
         if (result.hasErrors()) {
-            // 🛠️【修正：とんでもないエラー文を日本語だけにする】
-            // 生のエラーオブジェクトではなく、あなたがFormクラスに指定した日本語の「メッセージ内容（String）」だけを綺麗に抜き出します。
-            List<String> pureJapaneseMessages = result.getAllErrors().stream()
-                    .map(ObjectError::getDefaultMessage)
+            List<String> pureJapaneseMessages = result.getFieldErrors().stream()
+                    .map(error -> {
+                        String field = error.getField();
+                        String code = error.getCode();
+
+                        // 「aaaaa」の文字や「5000000...」の桁あふれ（型変換エラー）の条件
+                        if ("typeMismatch".equals(code)) {
+                            if ("price".equals(field)) {
+                                return "正しい価格形式で入力してください";
+                            }
+                            if ("stock".equals(field)) {
+                                return "正しい在庫数形式で入力してください";
+                            }
+                            return "正しい数値形式で入力してください";
+                        }
+
+                        // 100万以上（@Max）や未入力（@NotBlank）などはFormに記入したメッセージをそのまま使う
+                        return error.getDefaultMessage();
+                    })
+                    .distinct() // メッセージの重複を綺麗に排除する
                     .collect(Collectors.toList());
 
-            // 綺麗な日本語リストだけを画面に渡す（これでピンクの枠が出現し、綺麗な日本語だけが並びます）
+            // グローバルエラー（手動追加した画像エラーなど）をリストに合流
+            result.getGlobalErrors().forEach(error -> pureJapaneseMessages.add(error.getDefaultMessage()));
+
             model.addAttribute("errorMessages", pureJapaneseMessages);
-            model.addAttribute("categories", new ArrayList<>());
+            model.addAttribute("categories", productCategoryRepository.findAllByOrderByCategoryIdAsc());
             return "admin/product/add_form";
         }
 
-        // 表示用の項目を一時補完（確認画面クラッシュ防止）
-        form.setCategoryName("文房具");
-        form.setImagePath("/images/Shop_Img1.jpeg");
+        // 選択されたcategoryIdに対応する「本物のカテゴリ名」をDBから探して確認画面に引き継ぐ
+        if (form.getCategoryId() != null) {
+            List<ProductCategory> categories = productCategoryRepository.findAllByOrderByCategoryIdAsc();
+            for (ProductCategory cat : categories) {
+                if (cat.getId().equals(form.getCategoryId())) {
+                    form.setCategoryName(cat.getName());
+                    break;
+                }
+            }
+        }
+
+        // ⭕ ご要望の確認画面のURL（/admin/product/add/confirm）へリダイレクトして遷移させます
+        return "redirect:/admin/product/add/confirm";
+    }
+
+    /**
+     * 3️⃣ ■ BP013 新商品登録(確認)画面を表示
+     * ✨URL: GET /admin/product/add/confirm
+     */
+    @GetMapping("/confirm")
+    public String showConfirmPage(@ModelAttribute("form") ProductRegistrationForm form) {
         return "admin/product/add_confirm";
     }
 
-    /** 3️⃣ 確定処理：戻る or 完了 (POST /admin/product/add/confirm) */
-    @PostMapping("/add/confirm")
+    /**
+     * 4️⃣ 確定処理：戻る or 完了
+     * ✨URL: POST /admin/product/add/confirm
+     */
+    @PostMapping("/confirm")
     public String handleConfirmAction(@ModelAttribute("form") ProductRegistrationForm form,
             @RequestParam(value = "action", required = false) String action,
             SessionStatus sessionStatus, RedirectAttributes redirectAttributes) {
         if ("back".equals(action)) {
-            return "admin/product/add_form";
+            // 戻るボタンの際はリダイレクトして、入力画面（GET /admin/product/add）を綺麗に通します
+            return "redirect:/admin/product/add";
         }
 
         productService.registerProduct(form);
         redirectAttributes.addFlashAttribute("productName", form.getName());
         sessionStatus.setComplete();
-        return "redirect:/admin/product/complete";
+        // ⭕ ご要望の完了画面のURL（/admin/product/add/complete）へリダイレクトします
+        return "redirect:/admin/product/add/complete";
     }
 
-    /** 4️⃣ 完了画面表示 (GET /admin/product/complete) */
+    /**
+     * 5️⃣ ■ BP014 新商品登録(完了)画面を表示
+     * ✨URL: GET /admin/product/add/complete
+     */
     @GetMapping("/complete")
     public String showCompletePage() {
         return "admin/product/add_complete";

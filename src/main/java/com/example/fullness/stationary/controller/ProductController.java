@@ -92,22 +92,4 @@ public class ProductController {
         return "admin/product/search";
     }
 
-    /**
-     * 商品追加画面を表示します。
-     * 
-     * URL「/admin/product/add」に対するGETリクエストを処理します。
-     * 
-     * @param model 画面へデータを格納・送出するためのModelオブジェクト
-     * @return 商品追加画面のビュー名 "admin/product/add_form"
-     */
-    @GetMapping("/admin/product/add")
-    public String showAddForm(Model model) {
-        // 1. フォーム用の空のProductオブジェクトをセット
-        model.addAttribute("form", new Product());
-
-        // 2. プルダウン用のカテゴリ一覧をセット
-        model.addAttribute("categories", productService.findAllCategories());
-
-        return "admin/product/add_form";
-    }
 }

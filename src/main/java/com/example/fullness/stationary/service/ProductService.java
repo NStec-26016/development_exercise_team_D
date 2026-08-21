@@ -7,9 +7,9 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import com.example.fullness.stationary.entity.Category;
+import com.example.fullness.stationary.entity.ProductCategory;
 import com.example.fullness.stationary.entity.Product;
-import com.example.fullness.stationary.repository.CategoryRepository;
+import com.example.fullness.stationary.repository.ProductCategoryRepository;
 import com.example.fullness.stationary.repository.ProductRepository;
 
 /**
@@ -21,13 +21,13 @@ import com.example.fullness.stationary.repository.ProductRepository;
 @Service
 public class ProductService {
 
-    private final CategoryRepository categoryRepository;
+    private final ProductCategoryRepository categoryRepository;
     private final ProductRepository productRepository;
 
     /**
      * コンストラクタインジェクションによりリポジトリを注入します。
      */
-    public ProductService(CategoryRepository categoryRepository, ProductRepository productRepository) {
+    public ProductService(ProductCategoryRepository categoryRepository, ProductRepository productRepository) {
         this.categoryRepository = categoryRepository;
         this.productRepository = productRepository;
     }
@@ -37,7 +37,7 @@ public class ProductService {
      * 
      * @return カテゴリのリスト
      */
-    public List<Category> findAllCategories() {
+    public List<ProductCategory> findAllCategories() {
         return categoryRepository.findAllByOrderByCategoryIdAsc();
     }
 
