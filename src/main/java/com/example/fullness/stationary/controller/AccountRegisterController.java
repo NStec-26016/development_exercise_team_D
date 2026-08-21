@@ -1,5 +1,6 @@
 package com.example.fullness.stationary.controller;
 
+import com.example.fullness.stationary.entity.Employee;
 import com.example.fullness.stationary.form.AccountRegisterForm;
 import com.example.fullness.stationary.service.AccountRegisterService;
 import org.slf4j.Logger;
@@ -33,12 +34,46 @@ public class AccountRegisterController {
     }
 
     /**
+     * メニュー画面（menu.html）と同じヘッダー表示を維持するための共通処理
+     */
+    @ModelAttribute
+    public void addLoginStatusToModel(Model model) {
+        model.addAttribute("loggedIn", true);
+        model.addAttribute("loginEmployeeName", "管理者（ログイン中）");
+    }
+
+    /**
      * 1. 担当者アカウント登録(入力)画面の表示 (BP003)
+     * 💡 メニュー等からの新規アクセス時はセッションをクリアして空欄化します。
      */
     @GetMapping("/form")
-    public String showForm(Model model, @ModelAttribute("form") AccountRegisterForm form) {
+    public String showForm(Model model, @ModelAttribute("form") AccountRegisterForm form,
+            SessionStatus sessionStatus, jakarta.servlet.http.HttpServletRequest request) {
         try {
-            model.addAttribute("employees", accountRegisterService.getUnregisteredEmployees());
+            // 直前の画面（Refererヘッダー）が「確認画面（/confirm）」だった場合は、ユーザーが［戻る］操作をしたと判定します。
+            // この時はセッションを消去せず、保持されているデータをModelに再セットして画面に戻します。
+            String referer = request.getHeader("referer");
+            boolean isBackFromConfirm = (referer != null && referer.contains("/admin/account/confirm"));
+
+            if (isBackFromConfirm) {
+                model.addAttribute("employees", accountRegisterService.getUnregisteredEmployees());
+                model.addAttribute("form", form);
+                return "admin/account/form";
+            }
+
+            // メニューから新規で開いたとき（キャンセル後など）は完全初期化処理を行います
+            sessionStatus.setComplete();
+            form = new AccountRegisterForm();
+
+            List<Employee> employees = accountRegisterService.getUnregisteredEmployees();
+
+            if (employees == null || employees.isEmpty()) {
+                model.addAttribute("infoMessage", "アカウント登録可能な社員が存在しません");
+                model.addAttribute("employees", new ArrayList<>());
+            } else {
+                model.addAttribute("employees", employees);
+            }
+
             model.addAttribute("form", form);
         } catch (Exception e) {
             logger.error("社員情報の取得に失敗しました。詳細: ", e);
@@ -90,67 +125,89 @@ public class AccountRegisterController {
      */
     @GetMapping("/confirm")
     public String showConfirm(Model model, @ModelAttribute("form") AccountRegisterForm form) {
-
-        // 💡 修正点：セッションタイムアウト時の「入力画面へのリダイレクト」を仕様書通りに削除しました。
-        // 代わりに、システム例外をスローして共通エラー画面（500）にハンドリングさせます。
-        if (form.getAccountName() == null || form.getAccountName().trim().isEmpty() || form.getEmployeeId() == null
-                || form.getEmployeeId().trim().isEmpty()) {
-            throw new IllegalStateException("セッションタイムアウトが発生しました。");
-        }
-
+        // 仕様変更（p.74 BP004）：手動リダイレクト記述（BP003へ戻すif文）を完全削除。
         model.addAttribute("form", form);
         return "admin/account/confirm";
     }
 
     /**
-     * 2.5 確認画面からのポスト
+     * 2.5 確認画面からのポスト（登録ボタンまたは戻るボタン押下時）
      */
     @PostMapping("/confirm")
     public String handleConfirmAction(@ModelAttribute("form") AccountRegisterForm form,
             @RequestParam("action") String action,
+            Model model,
             RedirectAttributes redirectAttributes) {
 
+        // ［戻る］ボタン押下時は「redirect:」を完全に排除し、直接入力画面のHTMLを返却（フォワード）します。
+        // これにより、HTMLに値のはめ込み属性が用意されている「社員選択」と「アカウント名」の2つは画面に復元されます。
         if ("back".equals(action)) {
-            return "redirect:/admin/account/form";
+            model.addAttribute("employees", accountRegisterService.getUnregisteredEmployees());
+            model.addAttribute("form", form);
+            return "admin/account/form";
         }
 
         if ("register".equals(action)) {
             try {
                 if (accountRegisterService.isAccountNameDuplicate(form.getAccountName())) {
                     redirectAttributes.addFlashAttribute("errorMessages", List.of("このアカウント名は既に使用されています"));
-                    return "redirect:/admin/account/form";
+                    model.addAttribute("employees", accountRegisterService.getUnregisteredEmployees());
+                    model.addAttribute("form", form);
+                    return "admin/account/form";
                 }
 
+                // データベースに登録を実行
                 accountRegisterService.register(form);
-                redirectAttributes.addFlashAttribute("form", form);
+
+                // 💡 PRG方式：登録が成功した「完成したformデータ」を、リダイレクトを跨げる FlashAttribute へ乗せます。
+                // これにより、この直後にセッションをクリアしても、完了画面へ安全にデータが引き継がれます。
+                redirectAttributes.addFlashAttribute("completedForm", form);
 
                 return "redirect:/admin/account/complete";
 
             } catch (Exception e) {
                 logger.error("登録処理に失敗しました。詳細エラー: ", e);
+                // 仕様変更：エラー発生時、トップメニュー画面「BP001（/admin）」へリダイレクトします
                 redirectAttributes.addFlashAttribute("errorMessages", List.of("登録処理に失敗しました。管理者に連絡してください"));
-                return "redirect:/admin/account/form";
+                return "redirect:/admin";
             }
         }
 
-        return "redirect:/admin/account/form";
+        model.addAttribute("employees", accountRegisterService.getUnregisteredEmployees());
+        model.addAttribute("form", form);
+        return "admin/account/form";
     }
 
     /**
      * 3. 担当者アカウント登録(完了)画面の表示 (BP005)
      */
     @GetMapping("/complete")
-    public String showComplete(Model model, @ModelAttribute("form") AccountRegisterForm form) {
-        // 💡 修正点：不正アクセスのガード行（if文でのリダイレクト）を仕様書通りに「すべて削除」しました。
-        // これにより直接アクセスやリロード時も、エラーにならず完了画面の表示を維持・試行します。
+    public String showComplete(Model model,
+            @ModelAttribute("form") AccountRegisterForm form,
+            SessionStatus sessionStatus,
+            RedirectAttributes redirectAttributes) {
+        try {
+            // 💡 完了画面が表示された最初の瞬間に、次の連続登録に備えて `@SessionAttributes` のセッションを綺麗にお掃除します。
+            sessionStatus.setComplete();
 
-        model.addAttribute("form", form);
-        return "admin/account/complete";
-    }
+            // 💡 PRG方式：リダイレクトの波に乗って届いた登録完了データ（completedForm）がModel内に存在する場合は、
+            // 空っぽになってしまった通常の form をこの完了データで差し替えて画面（HTML）へ送ります。
+            if (model.containsAttribute("completedForm")) {
+                AccountRegisterForm completedForm = (AccountRegisterForm) model.asMap().get("completedForm");
+                model.addAttribute("form", completedForm);
+            } else {
+                // 仕様変更（不正アクセス行の削除）に対応：
+                // 2回目以降のリロードや、URL直接アクセスの場合、弾く記述は削除されているため、安全に表示だけを維持させます。
+                model.addAttribute("form", form);
+            }
 
-    @GetMapping("/reset")
-    public String resetForm(SessionStatus sessionStatus) {
-        sessionStatus.setComplete();
-        return "redirect:/admin/account/form";
+            return "admin/account/complete";
+
+        } catch (Exception e) {
+            logger.error("完了画面の表示処理に失敗しました。詳細エラー: ", e);
+            // 仕様変更（p.76 BP005 例外処理）：例外エラー発生時、トップ画面「BP001（/admin）」へ安全にリダイレクトします
+            redirectAttributes.addFlashAttribute("errorMessages", List.of("データの取得に失敗しました。トップ画面に戻ります"));
+            return "redirect:/admin";
+        }
     }
 }
