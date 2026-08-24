@@ -38,56 +38,66 @@ class ProductServiceTest {
     }
 
     @Test
-    void カテゴリ一覧が正常に取得できること() {
-        // 準備
-        List<Category> mockCategories = Arrays.asList(new Category(), new Category());
+    void findAllCategories_OK() {
+        // テストデータ
+        // カテゴリマスタデータ（全4種類のカテゴリリスト）
+        List<Category> mockCategories = Arrays.asList(new Category(), new Category(), new Category(), new Category());
         when(categoryRepository.findAllByOrderByCategoryIdAsc()).thenReturn(mockCategories);
 
-        // 実行
+        // テスト内容
+        // すべての商品カテゴリマスタを取得する
         List<Category> result = productService.findAllCategories();
 
-        // 検証
+        // 結果
+        // 返却されたリストがnullではなく、期待するサイズ4と実際のリストのサイズが一致すること
         assertNotNull(result);
-        assertEquals(2, result.size());
+        assertEquals(4, result.size());
         verify(categoryRepository, times(1)).findAllByOrderByCategoryIdAsc();
     }
 
     @Test
-    void カテゴリIDがnullのときに全商品がページング取得できること() {
-        // 準備
+    void findProducts_NullCategory_OK() {
+        // テストデータ
+        // カテゴリID未指定（categoryId = null）、ページング情報（size=10, page=0）
         Pageable pageable = PageRequest.of(0, 10);
-        List<Product> mockProducts = Arrays.asList(new Product(), new Product());
+        List<Product> mockProducts = Arrays.asList(new Product(), new Product()); // 1ページ分のモック商品データ
 
         when(productRepository.findAllWithPaging(anyInt(), anyLong())).thenReturn(mockProducts);
-        when(productRepository.countAll()).thenReturn(2L);
+        when(productRepository.countAll()).thenReturn(21L); // 総件数21件の前提
 
-        // 実行
+        // テスト内容
+        // カテゴリを指定せずに商品一覧のページング処理を実行する
         Page<Product> result = productService.findProductsByCategory(null, pageable);
 
-        // 検証
+        // 結果
+        // 返却されたPageオブジェクトがnullではなく、総件数の期待値21Lと実際の総要素数が一致すること
         assertNotNull(result);
-        assertEquals(2, result.getTotalElements());
-        verify(productRepository, times(1)).findAllWithPaging(anyInt(), anyLong());
+        assertEquals(21L, result.getTotalElements());
+        assertEquals(10, result.getSize());
+        verify(productRepository, times(1)).findAllWithPaging(10, 0L);
         verify(productRepository, times(1)).countAll();
     }
 
     @Test
-    void カテゴリID指定時に該当する商品がページング取得できること() {
-        // 準備
+    void findProducts_WithCategory_OK() {
+        // テストデータ
+        // カテゴリID指定（categoryId = 1：文房具）、ページング情報（size=10, page=0）
         Integer categoryId = 1;
         Pageable pageable = PageRequest.of(0, 10);
-        List<Product> mockProducts = Arrays.asList(new Product());
+        List<Product> mockProducts = Arrays.asList(new Product()); // 該当カテゴリのモック商品データ
 
         when(productRepository.findByCategoryIdWithPaging(eq(categoryId), anyInt(), anyLong()))
                 .thenReturn(mockProducts);
-        when(productRepository.countByCategoryId(categoryId)).thenReturn(1L);
+        when(productRepository.countByCategoryId(categoryId)).thenReturn(14L); // 文房具の件数14件の前提
 
-        // 実行
+        // テスト内容
+        // カテゴリ（文房具）を指定して商品一覧のページング処理を実行する
         Page<Product> result = productService.findProductsByCategory(categoryId, pageable);
 
-        // 検証
+        // 結果
+        // 返却されたPageオブジェクトがnullではなく、総件数の期待値14Lと実際の総要素数が一致すること
         assertNotNull(result);
-        assertEquals(1, result.getTotalElements());
+        assertEquals(14L, result.getTotalElements());
         verify(productRepository, times(1)).findByCategoryIdWithPaging(eq(categoryId), anyInt(), anyLong());
         verify(productRepository, times(1)).countByCategoryId(categoryId);
     }
