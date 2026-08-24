@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.fullness.stationary.repository.ProductRepository">
+
+ <select id="findProductDetailById" resultType="com.example.fullness.stationary.dto.ProductDetailDto">
+        SELECT 
+            p.id AS id,              
+            p.name AS name,
+            p.price AS price,
+            s.quantity AS stock,     
+            c.name AS categoryName,
+            p.image_url AS imagePath 
+        FROM 
+            product p
+        INNER JOIN 
+            product_category c ON p.product_category_id = c.id
+        LEFT JOIN 
+            product_stock s ON p.id = s.product_id
+        WHERE 
+            p.id = #{productId}
+            AND p.delete_flag = 0
+    </select>
+    <update id="deleteById">
+        UPDATE 
+            product
+        SET 
+            delete_flag = 1
+        WHERE 
+            id = #{productId}
+    </update>
+
+</mapper>

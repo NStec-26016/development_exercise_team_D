@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.fullness.stationary.repository.ProductCategoryRepository">
+
+    <resultMap id="ProductCategoryResult" type="com.example.fullness.stationary.entity.ProductCategory">
+        <id property="id" column="id" />
+        <result property="name" column="name" />
+    </resultMap>
+
+    <select id="findAllByOrderByCategoryIdAsc" resultMap="ProductCategoryResult">
+        SELECT id, name
+        FROM product_category
+        ORDER BY id ASC
+    </select>
+
+    <select id="findNameByCategoryId" parameterType="int" resultType="string">
+        SELECT name 
+        FROM product_category 
+        WHERE id = #{categoryId}
+    </select>
+
+</mapper>
+
