@@ -14,8 +14,6 @@ public class AccountRegisterForm implements Serializable {
     // ［社員名］必須選択仕様
     @NotBlank(message = "社員名を選択してください")
     private String employeeId;
-
-    // 💡 配布されている確認画面(confirm.html)や完了画面が求めている「社員名表示用フィールド」を復活
     private String employeeName;
 
     // ［アカウント名］必須、5～20文字、半角英数字

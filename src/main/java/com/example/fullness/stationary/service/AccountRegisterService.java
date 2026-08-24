@@ -17,7 +17,7 @@ public class AccountRegisterService {
     private EmployeeRepository employeeRepository;
 
     @Autowired
-    private EmployeeAccountRepository employeeAccountRepository; // ★JdbcTemplateから変更
+    private EmployeeAccountRepository employeeAccountRepository;
 
     @Autowired
     private PasswordEncoder passwordEncoder;

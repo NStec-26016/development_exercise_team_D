@@ -11,7 +11,7 @@ public interface EmployeeRepository {
     List<Employee> findUnregisteredEmployees();
 
     /**
-     * ★追加：社員IDから名前を取得
+     * 社員IDから名前を取得
      * @Param("id") を付けることで、XMLの #{id} と確実に紐付けます。
      */
     String findNameById(@Param("id") int id);

@@ -44,7 +44,7 @@ public class AccountRegisterController {
 
     /**
      * 1. 担当者アカウント登録(入力)画面の表示 (BP003)
-     * 💡 メニュー等からの新規アクセス時はセッションをクリアして空欄化します。
+     * メニュー等からの新規アクセス時はセッションをクリアして空欄化
      */
     @GetMapping("/form")
     public String showForm(Model model, @ModelAttribute("form") AccountRegisterForm form,
@@ -159,7 +159,7 @@ public class AccountRegisterController {
                 // データベースに登録を実行
                 accountRegisterService.register(form);
 
-                // 💡 PRG方式：登録が成功した「完成したformデータ」を、リダイレクトを跨げる FlashAttribute へ乗せます。
+                // PRG方式：登録が成功した「完成したformデータ」を、リダイレクトを跨げる FlashAttribute へ乗せます。
                 // これにより、この直後にセッションをクリアしても、完了画面へ安全にデータが引き継がれます。
                 redirectAttributes.addFlashAttribute("completedForm", form);
 
@@ -167,7 +167,6 @@ public class AccountRegisterController {
 
             } catch (Exception e) {
                 logger.error("登録処理に失敗しました。詳細エラー: ", e);
-                // 仕様変更：エラー発生時、トップメニュー画面「BP001（/admin）」へリダイレクトします
                 redirectAttributes.addFlashAttribute("errorMessages", List.of("登録処理に失敗しました。管理者に連絡してください"));
                 return "redirect:/admin";
             }
@@ -187,17 +186,14 @@ public class AccountRegisterController {
             SessionStatus sessionStatus,
             RedirectAttributes redirectAttributes) {
         try {
-            // 💡 完了画面が表示された最初の瞬間に、次の連続登録に備えて `@SessionAttributes` のセッションを綺麗にお掃除します。
             sessionStatus.setComplete();
 
-            // 💡 PRG方式：リダイレクトの波に乗って届いた登録完了データ（completedForm）がModel内に存在する場合は、
+            // PRG方式：リダイレクトの波に乗って届いた登録完了データ（completedForm）がModel内に存在する場合は、
             // 空っぽになってしまった通常の form をこの完了データで差し替えて画面（HTML）へ送ります。
             if (model.containsAttribute("completedForm")) {
                 AccountRegisterForm completedForm = (AccountRegisterForm) model.asMap().get("completedForm");
                 model.addAttribute("form", completedForm);
             } else {
-                // 仕様変更（不正アクセス行の削除）に対応：
-                // 2回目以降のリロードや、URL直接アクセスの場合、弾く記述は削除されているため、安全に表示だけを維持させます。
                 model.addAttribute("form", form);
             }
 
@@ -205,7 +201,6 @@ public class AccountRegisterController {
 
         } catch (Exception e) {
             logger.error("完了画面の表示処理に失敗しました。詳細エラー: ", e);
-            // 仕様変更（p.76 BP005 例外処理）：例外エラー発生時、トップ画面「BP001（/admin）」へ安全にリダイレクトします
             redirectAttributes.addFlashAttribute("errorMessages", List.of("データの取得に失敗しました。トップ画面に戻ります"));
             return "redirect:/admin";
         }

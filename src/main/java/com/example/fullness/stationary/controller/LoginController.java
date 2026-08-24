@@ -101,13 +101,11 @@ public class LoginController {
         }
 
         // ⬇️ ⬇️ ⬇️ UC９で追加⬇️ ⬇️ ⬇️
-
-        // 💡 最終解決：Spring Securityによって通常のログイン画面（GET）に強制リダイレクトされた際、
-        // 直前まで操作していた「アカウント登録の確認画面（/admin/account/confirm）」からのセッション切れの痕跡を直接検知します。
+        // Spring Securityによって通常のログイン画面（GET）に強制リダイレクトされた際、
+        // 直前まで操作していた「アカウント登録の確認画面（/admin/account/confirm）」からのセッション切れの痕跡を直接検知。
         if (request.getHeader("referer") != null && request.getHeader("referer").contains("/admin/account/confirm")) {
             model.addAttribute("errorMessage", "セッションが切れました。再度入力してください");
         }
-
         // ⬆️ ⬆️ ⬆️UC９で追加⬆️ ⬆️ ⬆️
 
         model.addAttribute("accountName", "");
