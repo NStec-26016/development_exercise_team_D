@@ -30,14 +30,13 @@ public class AccountRegisterService {
     }
 
     /**
-     * 社員IDから社員名を取得（実際の小文字テーブル名「employee」に修正）
+     * 社員IDから社員名を取得
      */
     public String getEmployeeNameById(String employeeId) {
         if (employeeId == null || employeeId.trim().isEmpty()) {
             return "";
         }
         try {
-            // 💡 修正箇所：\"Employee\" から、実態である全小文字の employee に修正しました
             String sql = "SELECT name FROM employee WHERE id = ?";
             int id = Integer.parseInt(employeeId.trim());
             return jdbcTemplate.queryForObject(sql, String.class, id);

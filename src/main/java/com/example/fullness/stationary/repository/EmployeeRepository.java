@@ -6,6 +6,6 @@ import java.util.List;
 
 @Mapper
 public interface EmployeeRepository {
-    // 💡 XMLで定義したSQLを実行するメソッド
+    // XMLで定義したSQLを実行するメソッド
     List<Employee> findUnregisteredEmployees();
 }
