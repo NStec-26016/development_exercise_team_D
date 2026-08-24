@@ -1,53 +1,72 @@
 package com.example.fullness.stationary.service;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import java.util.List;
+
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import com.example.fullness.stationary.dto.ProductDetailDto;
+import com.example.fullness.stationary.entity.ProductCategory;
 import com.example.fullness.stationary.entity.Product;
 import com.example.fullness.stationary.repository.ProductCategoryRepository;
 import com.example.fullness.stationary.repository.ProductRepository;
 
+/**
+ * 商品およびカテゴリに関するビジネスロジックを提供するサービスクラス。
+ * 
+ * @author Team_D
+ * @version 1.0
+ */
 @Service
 public class ProductService {
 
-    @Autowired
-    private ProductRepository productRepository;
+    private final ProductCategoryRepository categoryRepository;
+    private final ProductRepository productRepository;
 
-    @Autowired
-    private ProductCategoryRepository productCategoryRepository;
-
-    // 商品をIDで1件検索する
-    // public Product findById(Integer productId) {
-    // return productRepository.findById(productId);
-    // }
-
-    // 商品をIDで1件削除（論理削除）する
-    public void deleteById(Integer productId) {
-        productRepository.deleteById(productId);
+    /**
+     * コンストラクタインジェクションによりリポジトリを注入します。
+     */
+    public ProductService(ProductCategoryRepository categoryRepository, ProductRepository productRepository) {
+        this.categoryRepository = categoryRepository;
+        this.productRepository = productRepository;
     }
 
-    // カテゴリIDからデータベースの本物のカテゴリ名を取得する
-    public String getCategoryNameById(Integer categoryId) {
+    /**
+     * カテゴリマスタから全カテゴリをカテゴリIDの昇順で取得します。
+     * 
+     * @return カテゴリのリスト
+     */
+    public List<ProductCategory> findAllCategories() {
+        return categoryRepository.findAllByOrderByCategoryIdAsc();
+    }
+
+    /**
+     * 指定されたカテゴリIDに基づいて商品をページング形式で取得します。
+     * カテゴリIDがnullの場合は全商品を取得します。
+     * 
+     * @param categoryId 検索対象のカテゴリID（nullの場合は全件）
+     * @param pageable   ページネーション情報
+     * @return 商品のページオブジェクト
+     */
+    public Page<Product> findProductsByCategory(Integer categoryId, Pageable pageable) {
+        int limit = pageable.getPageSize();
+        long offset = pageable.getOffset();
+
+        List<Product> content;
+        long total;
+
         if (categoryId == null) {
-            return "なし";
+            // 初期表示時は全商品をページング取得
+            content = productRepository.findAllWithPaging(limit, offset);
+            total = productRepository.countAll();
+        } else {
+            // カテゴリで絞り込んでページング取得
+            content = productRepository.findByCategoryIdWithPaging(categoryId, limit, offset);
+            total = productRepository.countByCategoryId(categoryId);
         }
 
-        // カテゴリリポジトリを使って、IDからカテゴリの名前（文字列）を取得する
-        String categoryName = productCategoryRepository.findNameByCategoryId(categoryId);
-
-        // もしデータベースに名前が登録されていなかったら「不明」と返す
-        return (categoryName != null) ? categoryName : "不明";
+        // MyBatisのListと総件数から、SpringのPageオブジェクトを生成して返却
+        return new PageImpl<>(content, pageable, total);
     }
-
-    public ProductDetailDto getProductDetail(Integer productId) {
-        // Repositoryを呼び出して、JOINされたデータをそのままControllerに流す
-        return productRepository.findProductDetailById(productId);
-    }
-
-    public void deleteProduct(Integer productId) {
-        // Repositoryのvoidメソッドを呼び出してフラグを1に更新する
-        productRepository.deleteById(productId);
-    }
-
 }
