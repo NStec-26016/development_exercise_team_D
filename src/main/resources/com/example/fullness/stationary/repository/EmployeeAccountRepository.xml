@@ -34,49 +34,22 @@
         WHERE 
             name = #{name}
     </update>
-  <!-- ==================================================================== -->
-    <!-- 🔽 UC09で追記しました 🔽 -->
+    <!-- ==================================================================== -->
+    <!-- 🔽 UC09で追記しました（不要な重複を消去し、登録用SQLのみを追加） 🔽 -->
     <!-- ==================================================================== -->
 
-    <!-- 1. アカウント名の重複チェック用SQL -->
+    <!-- 1. アカウント名の重複チェック用SQL（既存のものをそのまま残す） -->
     <select id="countByName" resultType="int">
         SELECT COUNT(*)
         FROM employee_account
         WHERE name = #{name}
     </select>
 
-    <!-- 2. 担当者アカウント新規登録用SQL -->
-    <insert id="insertEmployeeAccount">
-        INSERT INTO employee_account (
-            employee_id,
-            name,
-            password,
-            employee_account_role,
-            failed_attempts,
-            lock_time
-        ) VALUES (
-            #{employeeId},
-            #{name},
-            #{password},
-            #{employeeAccountRole},
-            #{failedAttempts},
-            #{lockTime}
-        )
-    </insert>
-
-
-    //UC09で追記しました
-        <!-- 2. アカウント名の重複件数を数える -->
-    <select id="countByName" resultType="int">
-        SELECT COUNT(*) 
-        FROM employee_account 
-        WHERE name = #{name}
-    </select>
-
-    <!-- 3. 新規アカウントを登録する（INSERT） -->
-    <insert id="insertEmployeeAccount">
+    <!-- 2. ★新規追加：アカウントの登録用SQL（Javaのプロパティ名 employeeId に完全対応） -->
+    <insert id="insertEmployeeAccount" parameterType="com.example.fullness.stationary.entity.EmployeeAccount">
         INSERT INTO employee_account (employee_id, name, password) 
         VALUES (#{employeeId}, #{name}, #{password})
     </insert>
+
 
 </mapper>

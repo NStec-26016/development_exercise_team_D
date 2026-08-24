@@ -36,7 +36,7 @@ public class AccountRegisterService {
         if (employeeId == null || employeeId.trim().isEmpty()) {
             return "";
         }
-        // 💡 修正点：生SQLを撤去し、MyBatis経由で安全に1行で取得
+
         int id = Integer.parseInt(employeeId.trim());
         return employeeRepository.findNameById(id);
     }
@@ -48,7 +48,7 @@ public class AccountRegisterService {
         if (accountName == null || accountName.trim().isEmpty()) {
             return false;
         }
-        // 💡 修正点：生SQLを撤去し、既存リポジトリの countByName を呼び出す
+        // 既存リポジトリの countByName を呼び出す
         return employeeAccountRepository.countByName(accountName) > 0;
     }
 
@@ -60,9 +60,6 @@ public class AccountRegisterService {
         int selectedEmployeeId = Integer.parseInt(form.getEmployeeId().trim());
         String hashedPassword = passwordEncoder.encode(form.getPassword());
 
-        // 💡 修正点：Javaコード内の INSERT 文を完全撤去
-        // 既存の `insertEmployeeAccount` にオブジェクト、またはパラメータを安全に引き渡します
-        // ※もし既存リポジトリの引数がオブジェクト型の場合は、前述の通りEntityにセットして渡してください
         com.example.fullness.stationary.entity.EmployeeAccount account = new com.example.fullness.stationary.entity.EmployeeAccount();
         account.setEmployeeId(selectedEmployeeId);
         account.setName(form.getAccountName());
