@@ -2,9 +2,9 @@ package com.example.fullness.stationary.service;
 
 import com.example.fullness.stationary.entity.Employee;
 import com.example.fullness.stationary.repository.EmployeeRepository;
+import com.example.fullness.stationary.repository.EmployeeAccountRepository; // ★追加
 import com.example.fullness.stationary.form.AccountRegisterForm;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -17,45 +17,39 @@ public class AccountRegisterService {
     private EmployeeRepository employeeRepository;
 
     @Autowired
-    private JdbcTemplate jdbcTemplate;
+    private EmployeeAccountRepository employeeAccountRepository; // ★JdbcTemplateから変更
 
     @Autowired
     private PasswordEncoder passwordEncoder;
 
     /**
-     * 未登録の社員一覧を取得（MyBatisのXML経由で安全に取得）
+     * 未登録の社員一覧を取得
      */
     public List<Employee> getUnregisteredEmployees() {
         return employeeRepository.findUnregisteredEmployees();
     }
 
     /**
-     * 社員IDから社員名を取得（実際の小文字テーブル名「employee」に修正）
+     * 社員IDから社員名を取得
      */
     public String getEmployeeNameById(String employeeId) {
         if (employeeId == null || employeeId.trim().isEmpty()) {
             return "";
         }
-        try {
-            // 💡 修正箇所：\"Employee\" から、実態である全小文字の employee に修正しました
-            String sql = "SELECT name FROM employee WHERE id = ?";
-            int id = Integer.parseInt(employeeId.trim());
-            return jdbcTemplate.queryForObject(sql, String.class, id);
-        } catch (Exception e) {
-            return "";
-        }
+        // 💡 修正点：生SQLを撤去し、MyBatis経由で安全に1行で取得
+        int id = Integer.parseInt(employeeId.trim());
+        return employeeRepository.findNameById(id);
     }
 
     /**
      * アカウント名の重複チェック
      */
     public boolean isAccountNameDuplicate(String accountName) {
-        if (accountName == null || accountName.trim().isEmpty())
+        if (accountName == null || accountName.trim().isEmpty()) {
             return false;
-
-        String sql = "SELECT COUNT(*) FROM employee_account WHERE name = ?";
-        Integer count = jdbcTemplate.queryForObject(sql, Integer.class, accountName);
-        return count != null && count > 0;
+        }
+        // 💡 修正点：生SQLを撤去し、既存リポジトリの countByName を呼び出す
+        return employeeAccountRepository.countByName(accountName) > 0;
     }
 
     /**
@@ -63,11 +57,17 @@ public class AccountRegisterService {
      */
     @Transactional
     public void register(AccountRegisterForm form) {
-        String sql = "INSERT INTO employee_account (employee_id, name, password) VALUES (?, ?, ?)";
-
         int selectedEmployeeId = Integer.parseInt(form.getEmployeeId().trim());
         String hashedPassword = passwordEncoder.encode(form.getPassword());
 
-        jdbcTemplate.update(sql, selectedEmployeeId, form.getAccountName(), hashedPassword);
+        // 💡 修正点：Javaコード内の INSERT 文を完全撤去
+        // 既存の `insertEmployeeAccount` にオブジェクト、またはパラメータを安全に引き渡します
+        // ※もし既存リポジトリの引数がオブジェクト型の場合は、前述の通りEntityにセットして渡してください
+        com.example.fullness.stationary.entity.EmployeeAccount account = new com.example.fullness.stationary.entity.EmployeeAccount();
+        account.setEmployeeId(selectedEmployeeId);
+        account.setName(form.getAccountName());
+        account.setPassword(hashedPassword);
+
+        employeeAccountRepository.insertEmployeeAccount(account);
     }
 }

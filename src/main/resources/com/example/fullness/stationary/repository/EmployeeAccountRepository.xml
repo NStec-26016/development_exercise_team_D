@@ -64,4 +64,19 @@
         )
     </insert>
 
+
+    //UC09で追記しました
+        <!-- 2. アカウント名の重複件数を数える -->
+    <select id="countByName" resultType="int">
+        SELECT COUNT(*) 
+        FROM employee_account 
+        WHERE name = #{name}
+    </select>
+
+    <!-- 3. 新規アカウントを登録する（INSERT） -->
+    <insert id="insertEmployeeAccount">
+        INSERT INTO employee_account (employee_id, name, password) 
+        VALUES (#{employeeId}, #{name}, #{password})
+    </insert>
+
 </mapper>

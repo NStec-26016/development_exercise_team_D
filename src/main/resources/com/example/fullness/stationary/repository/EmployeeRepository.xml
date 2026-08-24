@@ -20,5 +20,12 @@
         ORDER BY e.id ASC
     </select>
 
+    <!-- 2. 社員IDから社員名（文字列）を1件取得する -->
+    <select id="findNameById" resultType="string">
+        SELECT name 
+        FROM employee 
+        WHERE id = #{id}
+    </select>
+
 </mapper>
 
