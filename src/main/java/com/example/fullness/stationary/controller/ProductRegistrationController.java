@@ -50,6 +50,9 @@ public class ProductRegistrationController {
     public String showAddForm(Model model) {
         model.addAttribute("errorMessages", null); // 通常時はピンクのエラー枠を完全に消す
 
+        // 💡 共通レイアウト(layout.html)の th:if="${loggedIn}" を反応させる
+        model.addAttribute("loggedIn", true); // 👈【追加】
+
         // データベースから本物のカテゴリ一覧を取得してHTMLに引き渡す
         List<ProductCategory> categoryList = productCategoryRepository.findAllByOrderByCategoryIdAsc();
         model.addAttribute("categories", categoryList);
@@ -74,6 +77,9 @@ public class ProductRegistrationController {
             if (contentType == null || (!contentType.equals("image/jpeg") && !contentType.equals("image/png")
                     && !contentType.equals("image/webp"))) {
                 result.rejectValue("image", "invalidFormat", "正しい画像形式でアップロードしてください");
+            } else {
+                // 💡【追加行①】確認画面の th:src に渡すために、選択されたファイル名（例: bag.jpg）をセットします
+                form.setImagePath("/images/" + file.getOriginalFilename());
             }
         }
 
@@ -129,7 +135,8 @@ public class ProductRegistrationController {
      * ✨URL: GET /admin/product/add/confirm
      */
     @GetMapping("/confirm")
-    public String showConfirmPage(@ModelAttribute("form") ProductRegistrationForm form) {
+    public String showConfirmPage(@ModelAttribute("form") ProductRegistrationForm form, Model model) {
+        model.addAttribute("loggedIn", true); // 👈【ここを追加】
         return "admin/product/add_confirm";
     }
 
@@ -146,6 +153,19 @@ public class ProductRegistrationController {
             return "redirect:/admin/product/add";
         }
 
+        // 💡【追加行②】完了ボタンを押したとき、選択されたファイルをチームDのimagesフォルダに物理保存します
+        MultipartFile file = form.getImage();
+        if (file != null && !file.isEmpty()) {
+            try {
+                // 💡【追加行③】指定のフォルダパス（C:\Users\...\images\）にファイルを出力します
+                file.transferTo(new java.io.File(
+                        "C:\\Users\\fullness\\development_exercise_team_D\\src\\main\\resources\\static\\images\\"
+                                + file.getOriginalFilename()));
+            } catch (java.io.IOException e) {
+                e.printStackTrace();
+            }
+        }
+
         productService.registerProduct(form);
         redirectAttributes.addFlashAttribute("productName", form.getName());
         sessionStatus.setComplete();
@@ -158,7 +178,8 @@ public class ProductRegistrationController {
      * ✨URL: GET /admin/product/add/complete
      */
     @GetMapping("/complete")
-    public String showCompletePage() {
+    public String showCompletePage(Model model) {
+        model.addAttribute("loggedIn", true); // 👈【ここを追加】
         return "admin/product/add_complete";
     }
 }
