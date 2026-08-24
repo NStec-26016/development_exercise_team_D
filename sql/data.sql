@@ -153,3 +153,6 @@ insert into employee_account (employee_id, name, password) values (1, 'marumoto'
 insert into employee_account (employee_id, name, password) values (2, 'ishikawa001', 'pass001');
 insert into employee_account (employee_id, name, password) values (3, 'suzuki003', 'pass002');
 
+-- 商品カテゴリー(product_category)テーブルに以下の要素を登録
+insert into product_category (name) values ('家電');
+
