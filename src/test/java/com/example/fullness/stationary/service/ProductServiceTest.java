@@ -19,7 +19,7 @@ import org.springframework.data.domain.Pageable;
 import com.example.fullness.stationary.entity.Category;
 import com.example.fullness.stationary.entity.Product;
 import com.example.fullness.stationary.repository.CategoryRepository;
-import com.example.fullness.stationary.repository.ProductRepository;
+import com.example.fullness.stationary.repository.ProjectCategoryRepository;
 
 class ProductServiceTest {
 
@@ -27,7 +27,7 @@ class ProductServiceTest {
     private CategoryRepository categoryRepository;
 
     @Mock
-    private ProductRepository productRepository;
+    private ProjectCategoryRepository productRepository;
 
     @InjectMocks
     private ProductService productService;

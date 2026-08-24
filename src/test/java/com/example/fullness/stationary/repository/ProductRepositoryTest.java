@@ -16,7 +16,7 @@ import com.example.fullness.stationary.entity.Product;
 class ProductRepositoryTest {
 
     @Autowired
-    private ProductRepository productRepository;
+    private ProjectCategoryRepository productRepository;
 
     // 1. countAll() に対応
     @Test

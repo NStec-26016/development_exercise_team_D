@@ -1,22 +1,24 @@
 package com.example.fullness.stationary.repository;
 
-import java.util.List;
+import com.example.fullness.stationary.entity.Product;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
-import com.example.fullness.stationary.entity.Product;
+import java.util.List;
 
 @Mapper
 public interface ProductRepository {
 
-    // 全件取得（ページング用）
+    // ページング用の全件取得
     List<Product> findAllWithPaging(@Param("limit") int limit, @Param("offset") long offset);
 
-    // カテゴリ別取得（ページング用）
-    List<Product> findByCategoryIdWithPaging(@Param("categoryId") Integer categoryId, @Param("limit") int limit, @Param("offset") long offset);
-
-    // 全件数カウント
+    // 全件の総数カウント
     long countAll();
 
-    // カテゴリ別件数カウント
+    // カテゴリIDで絞り込んだページング取得
+    List<Product> findByCategoryIdWithPaging(@Param("categoryId") Integer categoryId, @Param("limit") int limit,
+            @Param("offset") long offset);
+
+    // カテゴリIDごとの総数カウント
     long countByCategoryId(@Param("categoryId") Integer categoryId);
+
 }

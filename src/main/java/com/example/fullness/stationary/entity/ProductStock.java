@@ -6,6 +6,5 @@ import lombok.Data;
 public class ProductStock {
     private Integer id;
     private Integer productId;
-    private Integer quanity;
-
+    private Integer quantity;
 }

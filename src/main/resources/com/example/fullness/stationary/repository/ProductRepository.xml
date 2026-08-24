@@ -6,19 +6,20 @@
         <id property="id" column="id" />
         <result property="name" column="name" />
         <result property="price" column="price" />
-        <result property="imagePath" column="image_url" />
-        <result property="categoryId" column="product_category_id" />
+        <result property="imageUrl" column="image_url" />
+        <result property="productCategoryId" column="product_category_id" />
+        <result property="deleteFlag" column="delete_flag" />
     </resultMap>
 
     <select id="findAllWithPaging" resultMap="ProductResult">
-        SELECT id, name, price, image_url, product_category_id
+        SELECT id, name, price, image_url, product_category_id, delete_flag
         FROM product
         ORDER BY id ASC
         LIMIT #{limit} OFFSET #{offset}
     </select>
 
     <select id="findByCategoryIdWithPaging" resultMap="ProductResult">
-        SELECT id, name, price, image_url, product_category_id
+        SELECT id, name, price, image_url, product_category_id, delete_flag
         FROM product
         WHERE product_category_id = #{categoryId}
         ORDER BY id ASC
