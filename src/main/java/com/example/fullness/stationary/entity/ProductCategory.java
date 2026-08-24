@@ -5,7 +5,7 @@ import java.io.Serializable;
 import lombok.Data;
 
 @Data
-public class Department implements Serializable {
+public class ProductCategory implements Serializable {
 
     private Integer id;
 
