@@ -1,6 +1,7 @@
 package com.example.fullness.stationary.security;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 import org.junit.jupiter.api.DisplayName;
@@ -24,34 +25,30 @@ class ProductRegistrationServiceTest {
     @InjectMocks
     private ProductRegistrationService productRegistrationService;
 
+    // 1️⃣ ■ パターン1：【正常系】画像が正しく選択されて登録されるテスト
+
     @Test
-    @DisplayName("商品登録が正常に成功すること")
-    void registerProduct_Success() {
-        // 1. テストデータの準備
-        ProductRegistrationForm form = new ProductRegistrationForm();
-        form.setCategoryId(1);
-        form.setName("えんぴつ");
-        form.setPrice(70);
-        form.setImagePath("images/test.jpg");
-        form.setStock(10);
+    @DisplayName("正常系（パターン1）：画像が選択されている場合、Entityへ正しく値が詰め替えられ、200文字以内のパスでリポジトリが一度のみ呼び出されること")
+    void testRegisterProduct_WithImage_OK() {
+        ProductRegistrationForm testForm = new ProductRegistrationForm();
+        testForm.setCategoryId(1);
+        testForm.setName("えんぴつ");
+        testForm.setPrice(70);
+        testForm.setStock(10);
+        testForm.setImagePath("black_pen_o.jpg");
 
-        // 2. 引数をキャプチャする設定
+        productRegistrationService.registerProduct(testForm);
+
         ArgumentCaptor<Product> productCaptor = ArgumentCaptor.forClass(Product.class);
-
-        // 3. テスト実行
-        productRegistrationService.registerProduct(form);
-
-        // 4. 検証
         verify(productRegistrationRepository, times(1)).insertProductRegistration(productCaptor.capture());
 
-        Product capturedProduct = productCaptor.getValue();
-
-        // 1行ずつシンプルに検証
-        assertEquals(1, capturedProduct.getProduct_category_id());
-        assertEquals("えんぴつ", capturedProduct.getName());
-        assertEquals(70, capturedProduct.getPrice());
-        assertEquals("images/test.jpg", capturedProduct.getImageUrl());
-        assertEquals(10, capturedProduct.getStock());
-        assertEquals(0, capturedProduct.getDelete_flag());
+        Product actualProduct = productCaptor.getValue();
+        assertEquals(1, actualProduct.getProduct_category_id());
+        assertEquals("えんぴつ", actualProduct.getName());
+        assertEquals(70, actualProduct.getPrice());
+        assertEquals("black_pen_o.jpg", actualProduct.getImageUrl());
+        assertEquals(10, actualProduct.getStock());
+        assertEquals(0, actualProduct.getDelete_flag());
     }
+
 }

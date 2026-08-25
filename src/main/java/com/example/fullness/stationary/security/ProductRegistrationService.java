@@ -29,7 +29,7 @@ public class ProductRegistrationService {
         product.setName(form.getName());
         product.setPrice(form.getPrice());
 
-        product.setImageUrl(form.getImagePath());
+        product.setImageUrl(form.getImageUrl());
 
         product.setStock(form.getStock());
 

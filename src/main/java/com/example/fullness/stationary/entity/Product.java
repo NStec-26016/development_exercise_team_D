@@ -19,7 +19,7 @@ public class Product implements Serializable {
     // UC10追加
     private String imageUrl;
 
-    // private Integer categoryId;
+    // ここを private Integer categoryId;
 
     // UC10追加
     private Integer delete_flag;

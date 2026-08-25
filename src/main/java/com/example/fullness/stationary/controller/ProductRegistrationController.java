@@ -100,11 +100,9 @@ public class ProductRegistrationController {
                             }
                             return "正しい数値形式で入力してください";
                         }
-
-                        // 100万以上（@Max）や未入力（@NotBlank）などはFormに記入したメッセージをそのまま使う
                         return error.getDefaultMessage();
                     })
-                    .distinct() // メッセージの重複を綺麗に排除する
+                    .distinct()
                     .collect(Collectors.toList());
 
             // グローバルエラー（手動追加した画像エラーなど）をリストに合流
@@ -125,18 +123,16 @@ public class ProductRegistrationController {
                 }
             }
         }
-
-        // ⭕ ご要望の確認画面のURL（/admin/product/add/confirm）へリダイレクトして遷移させます
         return "redirect:/admin/product/add/confirm";
     }
 
     /**
-     * 3️⃣ ■ BP013 新商品登録(確認)画面を表示
+     * BP013 新商品登録(確認)画面を表示
      * ✨URL: GET /admin/product/add/confirm
      */
     @GetMapping("/confirm")
     public String showConfirmPage(@ModelAttribute("form") ProductRegistrationForm form, Model model) {
-        model.addAttribute("loggedIn", true); // 👈【ここを追加】
+        model.addAttribute("loggedIn", true);
         return "admin/product/add_confirm";
     }
 
@@ -149,15 +145,13 @@ public class ProductRegistrationController {
             @RequestParam(value = "action", required = false) String action,
             SessionStatus sessionStatus, RedirectAttributes redirectAttributes) {
         if ("back".equals(action)) {
-            // 戻るボタンの際はリダイレクトして、入力画面（GET /admin/product/add）を綺麗に通します
+            // 戻るボタンの際はリダイレクトして、入力画面（GET /admin/product/add）に遷移
             return "redirect:/admin/product/add";
         }
-
-        // 💡【追加行②】完了ボタンを押したとき、選択されたファイルをチームDのimagesフォルダに物理保存します
         MultipartFile file = form.getImage();
         if (file != null && !file.isEmpty()) {
             try {
-                // 💡【追加行③】指定のフォルダパス（C:\Users\...\images\）にファイルを出力します
+                // 【追加行】指定のフォルダパス（C:\Users\...\images\）にファイルを出力します
                 file.transferTo(new java.io.File(
                         "C:\\Users\\fullness\\development_exercise_team_D\\src\\main\\resources\\static\\images\\"
                                 + file.getOriginalFilename()));
@@ -169,7 +163,6 @@ public class ProductRegistrationController {
         productService.registerProduct(form);
         redirectAttributes.addFlashAttribute("productName", form.getName());
         sessionStatus.setComplete();
-        // ⭕ ご要望の完了画面のURL（/admin/product/add/complete）へリダイレクトします
         return "redirect:/admin/product/add/complete";
     }
 
