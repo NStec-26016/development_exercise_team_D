@@ -174,3 +174,31 @@ insert into product_category (name) values ('家電');
 insert into product_stock (product_id, quantity) values (1, 50);
 insert into product_stock (product_id, quantity) values (2, 100);
 insert into product_stock (product_id, quantity) values (3, 200);
+
+insert into product_category (name) values ('文房具'), ('ガジェット'), ('ファッション'), ('日用品');
+
+insert into product (product_category_id, name, price, image_url, delete_flag) values
+(1, '黒筆ペン', 250, 'images/black_fudepen.jpg', 0),
+(1, '黒ボールペン（太字）', 150, 'images/black_pen_o.jpg', 0),
+(1, '黒ボールペン（細字）', 150, 'images/black_pen_w.jpg', 0),
+(1, '黒ボールペン', 120, 'images/black_pen.jpg', 0),
+(1, '青マーカー', 180, 'images/blue_maker.jpg', 0),
+(1, '青筆ペン', 250, 'images/blue_fudepen.jpg', 0),
+(1, '青ボールペン（太字）', 150, 'images/blue_pen_o.jpg', 0),
+(1, '青ボールペン（細字）', 150, 'images/blue_pen_w.jpg', 0),
+(1, 'カラーペン 12色', 800, 'images/color_pen12.jpg', 0),
+(1, 'カラーペン 48色', 2800, 'images/color_pen48.jpg', 0),
+(1, '緑マーカー', 180, 'images/green_maker.jpg', 0),
+(1, '黄色マーカー', 180, 'images/yellow_maker.jpg', 0),
+(1, '赤ボールペン', 120, 'images/red_pen.jpg', 0),
+(1, '赤ボールペン（太字）', 150, 'images/red_pen_o.jpg', 0),
+(2, 'マウス A', 2980, 'images/mouse_a.jpg', 0),
+(2, 'マウス B', 3480, 'images/mouse_b.jpg', 0),
+(2, 'マウス C', 2500, 'images/mouse_c.jpg', 0),
+(2, 'マウス D', 2700, 'images/mouse_d.jpg', 0),
+(3, 'トートバッグ', 4500, 'images/bag.jpg', 0),
+(4, 'マスク', 1000, 'images/mask.jpg', 0),
+(4, '傘', 2200, 'images/umbrella.jpg', 0);
+
+insert into product_stock (product_id, quantity)
+select i, 20 from generate_series(1, 21) as s(i);
