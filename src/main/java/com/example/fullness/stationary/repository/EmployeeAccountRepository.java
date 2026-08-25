@@ -31,6 +31,10 @@ public interface EmployeeAccountRepository {
      */
     void updateLockStatus(EmployeeAccount employeeAccount);
 
+    // ⬇️⬇️UC9にて追加しました！（深堀）
     // UC09 担当者アカウント登録
     int insertEmployeeAccount(EmployeeAccount employeeAccount);
+
+    // アカウント名の重複件数を数えるメソッド
+    int countByName(@Param("name") String name);
 }
