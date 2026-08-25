@@ -1,26 +1,25 @@
-// package com.example.fullness.stationary.repository;
+package com.example.fullness.stationary.repository;
 
-// import com.example.fullness.stationary.entity.Product;
-// import com.example.fullness.stationary.entity.ProjectCategory; // ←
-// ProjectCategoryにする！
-// import org.apache.ibatis.annotations.Mapper;
-// import org.apache.ibatis.annotations.Param;
-// import java.util.List;
+import java.util.List;
 
-// @Mapper
-// public interface ProductRepository {
+import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 
-// List<Product> findAllWithPaging(@Param("limit") int limit, @Param("offset")
-// long offset);
+import com.example.fullness.stationary.entity.Product;
+import com.example.fullness.stationary.entity.ProductCategory;
 
-// long countAll();
+@Mapper
+public interface ProductRepository {
 
-// List<Product> findByCategoryIdWithPaging(@Param("categoryId") Integer
-// categoryId, @Param("limit") int limit,
-// @Param("offset") long offset);
+    List<Product> findAllWithPaging(@Param("limit") int limit, @Param("offset") long offset);
 
-// long countByCategoryId(@Param("categoryId") Integer categoryId);
+    long countAll();
 
-// // 戻り値を ProjectCategory にする
-// List<ProjectCategory> findAllCategories();
-// }
+    List<Product> findByCategoryIdWithPaging(@Param("categoryId") Integer categoryId, @Param("limit") int limit,
+            @Param("offset") long offset);
+
+    long countByCategoryId(@Param("categoryId") Integer categoryId);
+
+    // 全カテゴリを取得するメソッド
+    List<ProductCategory> findAllCategories();
+}

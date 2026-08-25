@@ -24,10 +24,10 @@ public class ProductDeleteController {
     public String showProductDeleteConfirmPage(@PathVariable("productId") Integer productId, Model model,
             Authentication authentication) {
 
-        boolean isLoggedIn = authentication != null
+        boolean loggedIn = authentication != null
                 && authentication.isAuthenticated()
                 && !authentication.getPrincipal().equals("anonymousUser");
-        model.addAttribute("isLoggedIn", isLoggedIn);
+        model.addAttribute("loggedIn", loggedIn);
 
         // DTOをServiceから取得
         ProductDetailDto productDetail = productService.getProductDetail(productId);
@@ -42,10 +42,10 @@ public class ProductDeleteController {
     public String executeDelete(@PathVariable("productId") Integer productId,
             Model model, Authentication authentication) {
 
-        boolean isLoggedIn = authentication != null
+        boolean loggedIn = authentication != null
                 && authentication.isAuthenticated()
                 && !authentication.getPrincipal().equals("anonymousUser");
-        model.addAttribute("isLoggedIn", isLoggedIn);
+        model.addAttribute("loggedIn", loggedIn);
 
         ProductDetailDto productDetail = productService.getProductDetail(productId);
         String productName = "不明な商品";
