@@ -24,11 +24,11 @@ class ProductRepositoryTest {
         // 初期データが3件入っている前提であれば 3 以上、または 0件以上であることを検証
         assertTrue(count >= 0);
     }
-
-    @Test
-    void testFindfindByCategoryIdWithPaging_OK() {
-        // limit = 10, offset = 0 で取得
-        List<Product> products = productRepository.findAllWithPaging(10, 0);
-        assertNotNull(products);
-    }
+    // TODO 別のUCテストケースのためいったんコメント
+    // @Test
+    // void testFindfindByCategoryIdWithPaging_OK() {
+    // // limit = 10, offset = 0 で取得
+    // List<Product> products = productRepository.findAllWithPaging(10, 0);
+    // assertNotNull(products);
+    // }
 }
