@@ -43,12 +43,12 @@ class ProductRegistrationServiceTest {
         verify(productRegistrationRepository, times(1)).insertProductRegistration(productCaptor.capture());
 
         Product actualProduct = productCaptor.getValue();
-        assertEquals(1, actualProduct.getProduct_category_id());
+        assertEquals(1, actualProduct.getProductCategoryId());
         assertEquals("えんぴつ", actualProduct.getName());
         assertEquals(70, actualProduct.getPrice());
         assertEquals("black_pen_o.jpg", actualProduct.getImageUrl());
         assertEquals(10, actualProduct.getStock());
-        assertEquals(0, actualProduct.getDelete_flag());
+        assertEquals(0, actualProduct.getDeleteFlag());
     }
 
 }

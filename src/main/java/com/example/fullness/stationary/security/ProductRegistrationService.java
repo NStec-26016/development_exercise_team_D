@@ -24,7 +24,7 @@ public class ProductRegistrationService {
 
         Product product = new Product();
 
-        product.setProduct_category_id(form.getCategoryId());
+        product.setProductCategoryId(form.getCategoryId());
 
         product.setName(form.getName());
         product.setPrice(form.getPrice());
@@ -33,7 +33,7 @@ public class ProductRegistrationService {
 
         product.setStock(form.getStock());
 
-        product.setDelete_flag(0);
+        product.setDeleteFlag(0);
 
         productRegistrationRepository.insertProductRegistration(product);
     }

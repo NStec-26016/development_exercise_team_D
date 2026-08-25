@@ -19,7 +19,7 @@ class ProductRegistrationRepositoryTest {
     void ProductRegistrationRepositoryTest_OK() {
         // テストデータの準備
         Product product = new Product();
-        product.setProduct_category_id(1);
+        product.setProductCategoryId(1);
         product.setName("えんぴつ");
         product.setPrice(70);
         product.setImageUrl("black_pen.jpg");
