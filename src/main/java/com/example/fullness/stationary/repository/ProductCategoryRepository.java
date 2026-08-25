@@ -1,5 +1,7 @@
 package com.example.fullness.stationary.repository;
 
+import java.util.List;
+
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
@@ -20,4 +22,5 @@ public interface ProductCategoryRepository {
 
     ProductCategory findByName(@Param("name") String name);
 
+    List<ProductCategory> findAllByOrderByCategoryIdAsc();
 }
