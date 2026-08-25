@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.security.core.Authentication;
 
 import com.example.fullness.stationary.dto.ProductDetailDto;
 import com.example.fullness.stationary.entity.Product;
@@ -20,7 +21,14 @@ public class ProductDeleteController {
     private ProductDeleteService productService;
 
     @GetMapping("/delete/{productId}")
-    public String showProductDeleteConfirmPage(@PathVariable("productId") Integer productId, Model model) {
+    public String showProductDeleteConfirmPage(@PathVariable("productId") Integer productId, Model model,
+            Authentication authentication) {
+
+        boolean isLoggedIn = authentication != null
+                && authentication.isAuthenticated()
+                && !authentication.getPrincipal().equals("anonymousUser");
+        model.addAttribute("isLoggedIn", isLoggedIn);
+
         // DTOをServiceから取得
         ProductDetailDto productDetail = productService.getProductDetail(productId);
 
@@ -32,7 +40,12 @@ public class ProductDeleteController {
 
     @PostMapping("/delete/{productId}")
     public String executeDelete(@PathVariable("productId") Integer productId,
-            Model model) {
+            Model model, Authentication authentication) {
+
+        boolean isLoggedIn = authentication != null
+                && authentication.isAuthenticated()
+                && !authentication.getPrincipal().equals("anonymousUser");
+        model.addAttribute("isLoggedIn", isLoggedIn);
 
         ProductDetailDto productDetail = productService.getProductDetail(productId);
         String productName = "不明な商品";

@@ -8,7 +8,7 @@ import lombok.Data;
 public class Product implements Serializable {
     private Integer id;
 
-    private Integer ProductCategoryId;
+    private Integer productCategoryId;
 
     private String name;
 
