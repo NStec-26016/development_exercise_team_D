@@ -151,8 +151,26 @@ delete from employee_account where employee_id = 3;
 -- insert into employee_account (employee_id, name, password) values (1, '丸ちゃん', '$2a$10$wO3l2UiwZ3U13B0r8G9T2O6ZfL3r2zWjR3M7q6Nn/y5u8u7xMvKy6');
 insert into employee_account (employee_id, name, password) values (1, 'marumoto', 'maru1');
 insert into employee_account (employee_id, name, password) values (2, 'ishikawa001', 'pass001');
+insert into employee_account (employee_id, name, password) values (3, 'suzuki003', 'pass002');-- ---- テスト用：商品カテゴリーの挿入 ----
+insert into product_category (name) values ('筆記具');
+insert into product_category (name) values ('ノート・紙製品');
+
+-- ---- テスト用：商品の挿入（product_category_id: 1=筆記具, 2=ノート） ----
+-- idは自動採番（SERIAL）されます
+insert into product (product_category_id, name, price, image_url, delete_flag) 
+values (1, '高級ボールペン', 1200, 'images/pen1.jpeg', 0);
+
+insert into product (product_category_id, name, price, image_url, delete_flag) 
+values (1, 'シャープペンシル', 500, 'images/sharp1.jpeg', 0);
+
+insert into product (product_category_id, name, price, image_url, delete_flag) 
+values (2, '方眼ノート A5', 250, 'images/note1.jpeg', 0);
 insert into employee_account (employee_id, name, password) values (3, 'suzuki003', 'pass002');
 
 -- 商品カテゴリー(product_category)テーブルに以下の要素を登録
 insert into product_category (name) values ('家電');
 
+-- ---- テスト用：商品在庫の挿入（product_id: 1, 2, 3 に対応） ----
+insert into product_stock (product_id, quantity) values (1, 50);
+insert into product_stock (product_id, quantity) values (2, 100);
+insert into product_stock (product_id, quantity) values (3, 200);

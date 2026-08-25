@@ -5,6 +5,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
 
 /**
  * ログイン画面および管理者用メニュー画面の遷移と制御を行うコントローラークラス。
@@ -51,7 +52,8 @@ public class LoginController {
      * @param request クライアントからのHTTPリクエスト情報。セッションスコープからログイン例外を取得するために使用
      * @return ログイン画面のビュー名 "admin/login"
      */
-    @GetMapping("/admin/login")
+    @RequestMapping(value = "/admin/login", method = { org.springframework.web.bind.annotation.RequestMethod.GET,
+            org.springframework.web.bind.annotation.RequestMethod.POST })
     public String showLoginPage(
             org.springframework.ui.Model model,
             @org.springframework.web.bind.annotation.RequestParam(value = "error", required = false) String error,
@@ -98,9 +100,18 @@ public class LoginController {
             model.addAttribute("errorMessage", null);
         }
 
+        // ⬇️ ⬇️ ⬇️ UC９で追加⬇️ ⬇️ ⬇️
+        // Spring Securityによって通常のログイン画面（GET）に強制リダイレクトされた際、
+        // 直前まで操作していた「アカウント登録の確認画面（/admin/account/confirm）」からのセッション切れの痕跡を直接検知。
+        if (request.getHeader("referer") != null && request.getHeader("referer").contains("/admin/account/confirm")) {
+            model.addAttribute("errorMessage", "セッションが切れました。再度入力してください");
+        }
+        // ⬆️ ⬆️ ⬆️UC９で追加⬆️ ⬆️ ⬆️
+
         model.addAttribute("accountName", "");
         model.addAttribute("loggedIn", false);
         return "admin/login";
+
     }
 
     /**

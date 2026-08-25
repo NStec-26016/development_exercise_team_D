@@ -54,6 +54,9 @@ dependencies {
  
 
 
+	//UC9にて追加
+	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+
 
 
 }

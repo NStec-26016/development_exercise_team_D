@@ -9,5 +9,6 @@ public class Department implements Serializable {
 
     private Integer id;
 
+    // Nameをnameに変更（UC９）
     private String name;
 }
