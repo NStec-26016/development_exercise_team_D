@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?> 
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.fullness.stationary.repository.ProductCategoryRepository">
+
+    <!-- 
+         #{name}: Javaの引数 (@Param("name") String name) の値がここに埋め込まれる
+    -->
+    <insert id="insertCategory">
+        INSERT INTO product_category (
+            name
+        ) VALUES (
+            #{name}
+        )
+    </insert>
+
+    <resultMap id="ProductCategoryResult" type="com.example.fullness.stationary.entity.ProductCategory">
+        <id property="id" column="id" /> 
+        <result property="name" column="name" /> 
+    </resultMap>
+
+    <select id="findByName" resultMap="ProductCategoryResult">
+     SELECT 
+            id, 
+            name 
+        FROM 
+            product_category 
+        WHERE 
+            name = #{name}
+    </select>
+
+</mapper>
