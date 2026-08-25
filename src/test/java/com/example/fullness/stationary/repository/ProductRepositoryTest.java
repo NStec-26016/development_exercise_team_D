@@ -1,60 +1,98 @@
 package com.example.fullness.stationary.repository;
 
-import static org.junit.jupiter.api.Assertions.*;
+// JUnitの検証用メソッドをインポートします
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import java.util.List;
 
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.mybatis.spring.boot.test.autoconfigure.MybatisTest;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.transaction.annotation.Transactional;
+import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 
 import com.example.fullness.stationary.entity.Product;
+import com.example.fullness.stationary.entity.ProductCategory; // ProductCategoryに修正
 
-@SpringBootTest
-@Transactional
+/**
+ * ProductRepositoryの単体テストクラス。
+ */
+@MybatisTest
+@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 class ProductRepositoryTest {
 
+    // テスト対象となる ProductRepository を自動注入（DI）します
     @Autowired
-    private ProjectCategoryRepository productRepository;
+    private ProductRepository productRepository;
 
-    // 1. countAll() に対応
     @Test
-    void testCountAll_ReturnsTotalCount() {
-        long count = productRepository.countAll();
-        assertEquals(21L, count); // 21件の初期データとの一致検証
+    @DisplayName("findAllCategories: 4つのカテゴリ（文房具、ガジェット、ファッション、日用品）が正しく取得できること")
+    void testFindAllCategories_OK() {
+        // リポジトリの findAllCategories() を実行し、全カテゴリのリストを取得します
+        List<ProductCategory> categories = productRepository.findAllCategories();
+
+        // 取得したリストが null でないことを検証します
+        assertNotNull(categories);
+        // 取得したカテゴリの件数が 4件 であることを検証します
+        assertEquals(4, categories.size());
+        // 1番目のカテゴリ名が「文房具」であることを検証します
+        assertEquals("文房具", categories.get(0).getName());
+        // 2番目のカテゴリ名が「ガジェット」であることを検証します
+        assertEquals("ガジェット", categories.get(1).getName());
+        // 3番目のカテゴリ名が「ファッション」であることを検証します
+        assertEquals("ファッション", categories.get(2).getName());
+        // 4番目のカテゴリ名が「日用品」であることを検証します
+        assertEquals("日用品", categories.get(3).getName());
     }
 
-    // 2. countByCategoryId() に対応
     @Test
-    void testCountByCategoryId_WithValidCategoryId_ReturnsCategoryCount() {
-        Integer categoryId = 1; // 文房具（14件）
-        long count = productRepository.countByCategoryId(categoryId);
-        assertEquals(14L, count);
-    }
+    @DisplayName("findAllWithPaging: 全商品がページング付きで取得できること")
+    void testFindAllWithPaging_OK() {
+        // 1ページ10件、オフセット0を指定して、全商品のページング取得を実行します
+        List<Product> products = productRepository.findAllWithPaging(10, 0L);
 
-    // 3. findAllWithPaging() に対応（1ページ目）
-    @Test
-    void testFindAllWithPaging_FirstPage_ReturnsTenProducts() {
-        List<Product> products = productRepository.findAllWithPaging(10, 0);
+        // 取得したリストが null でないことを検証します
         assertNotNull(products);
+        // 1ページあたりの取得件数が 10件 であることを検証します
         assertEquals(10, products.size());
     }
 
-    // 4. findAllWithPaging() に対応（3ページ目・端数）
     @Test
-    void testFindAllWithPaging_ThirdPage_ReturnsRemainingProduct() {
-        List<Product> products = productRepository.findAllWithPaging(10, 20);
-        assertNotNull(products);
-        assertEquals(1, products.size());
+    @DisplayName("countAll: 全商品の総数が21件であること")
+    void testCountAll_OK() {
+        // 全商品の総件数をカウントするメソッドを実行します
+        long count = productRepository.countAll();
+
+        // 取得した総件数が初期データ通りの 21L であることを検証します
+        assertEquals(21L, count);
     }
 
-    // 5. findByCategoryIdWithPaging() に対応
     @Test
-    void testFindByCategoryIdWithPaging_WithValidCategoryId_ReturnsFilteredProducts() {
-        Integer categoryId = 2; // ガジェット（4件）
-        List<Product> products = productRepository.findByCategoryIdWithPaging(categoryId, 10, 0);
+    @DisplayName("findByCategoryIdWithPaging: 指定したカテゴリID（1:文房具）に紐づく商品が取得できること")
+    void testFindByCategoryIdWithPaging_OK() {
+        // 検索条件としてカテゴリID「1（文房具）」を指定します
+        Integer categoryId = 1;
+
+        // 指定カテゴリの商品をページング（1ページ10件、オフセット0）で取得します
+        List<Product> products = productRepository.findByCategoryIdWithPaging(categoryId, 10, 0L);
+
+        // 取得したリストが null でないことを検証します
         assertNotNull(products);
-        assertEquals(4, products.size());
+        // 1ページあたりの取得件数が 10件 であることを検証します
+        assertEquals(10, products.size());
+    }
+
+    @Test
+    @DisplayName("countByCategoryId: 指定したカテゴリID（1:文房具）の件数が14件であること")
+    void testCountByCategoryId_OK() {
+        // 対象のカテゴリIDとして「1（文房具）」を指定します
+        Integer categoryId = 1;
+
+        // 指定したカテゴリに属する商品の総件数をカウントします
+        long count = productRepository.countByCategoryId(categoryId);
+
+        // カウント数が文房具の登録数である 14L であることを検証します
+        assertEquals(14L, count);
     }
 }

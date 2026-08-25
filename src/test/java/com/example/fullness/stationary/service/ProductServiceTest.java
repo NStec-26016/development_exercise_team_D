@@ -1,104 +1,88 @@
 package com.example.fullness.stationary.service;
 
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.Mockito.*;
+// JUnitの検証用メソッドをインポートします
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
-import java.util.Arrays;
 import java.util.List;
 
-import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.transaction.annotation.Transactional;
 
-import com.example.fullness.stationary.entity.Category;
 import com.example.fullness.stationary.entity.Product;
-import com.example.fullness.stationary.repository.CategoryRepository;
-import com.example.fullness.stationary.repository.ProjectCategoryRepository;
+import com.example.fullness.stationary.entity.ProductCategory;
 
+/**
+ * 実際のデータベース（初期データ）と連携して
+ * ProductServiceの動作を検証する統合テストクラス。
+ */
+@SpringBootTest
+@Transactional // テストごとにデータベースの変更をロールバックします
 class ProductServiceTest {
 
-    @Mock
-    private CategoryRepository categoryRepository;
-
-    @Mock
-    private ProjectCategoryRepository productRepository;
-
-    @InjectMocks
+    // テスト対象となる実際の ProductService を自動注入（DI）します
+    @Autowired
     private ProductService productService;
 
-    @BeforeEach
-    void setUp() {
-        MockitoAnnotations.openMocks(this);
-    }
-
     @Test
-    void findAllCategories_OK() {
-        // テストデータ
-        // カテゴリマスタデータ（全4種類のカテゴリリスト）
-        List<Category> mockCategories = Arrays.asList(new Category(), new Category(), new Category(), new Category());
-        when(categoryRepository.findAllByOrderByCategoryIdAsc()).thenReturn(mockCategories);
+    @DisplayName("findAllCategories: SQLの初期データから4つのカテゴリ（文房具、ガジェット、ファッション、日用品）が正しく取得できること")
+    void testFindAllCategories_OK() {
+        // サービスクラスの findAllCategories() を実行します
+        List<ProductCategory> result = productService.findAllCategories();
 
-        // テスト内容
-        // すべての商品カテゴリマスタを取得する
-        List<Category> result = productService.findAllCategories();
-
-        // 結果
-        // 返却されたリストがnullではなく、期待するサイズ4と実際のリストのサイズが一致すること
+        // 取得した結果が null でないことを検証します
         assertNotNull(result);
+        // 初期データの通り、カテゴリの総件数が 4件 であることを検証します
         assertEquals(4, result.size());
-        verify(categoryRepository, times(1)).findAllByOrderByCategoryIdAsc();
+        // 1番目のカテゴリ名が「文房具」であることを検証します
+        assertEquals("文房具", result.get(0).getName());
+        // 2番目のカテゴリ名が「ガジェット」であることを検証します
+        assertEquals("ガジェット", result.get(1).getName());
+        // 3番目のカテゴリ名が「ファッション」であることを検証します
+        assertEquals("ファッション", result.get(2).getName());
+        // 4番目のカテゴリ名が「日用品」であることを検証します
+        assertEquals("日用品", result.get(3).getName());
     }
 
     @Test
-    void findProducts_NullCategory_OK() {
-        // テストデータ
-        // カテゴリID未指定（categoryId = null）、ページング情報（size=10, page=0）
+    @DisplayName("findProductsByCategory: カテゴリIDが null の場合、初期データの全商品からページング付きで取得できること")
+    void testFindProductsByCategory_NoCategory_OK() {
+        // ページング条件（1ページ目、10件表示）を指定します
         Pageable pageable = PageRequest.of(0, 10);
-        List<Product> mockProducts = Arrays.asList(new Product(), new Product()); // 1ページ分のモック商品データ
 
-        when(productRepository.findAllWithPaging(anyInt(), anyLong())).thenReturn(mockProducts);
-        when(productRepository.countAll()).thenReturn(21L); // 総件数21件の前提
+        // カテゴリIDに null を指定してサービスクラスを実行します
+        Page<Product> resultPage = productService.findProductsByCategory(null, pageable);
 
-        // テスト内容
-        // カテゴリを指定せずに商品一覧のページング処理を実行する
-        Page<Product> result = productService.findProductsByCategory(null, pageable);
-
-        // 結果
-        // 返却されたPageオブジェクトがnullではなく、総件数の期待値21Lと実際の総要素数が一致すること
-        assertNotNull(result);
-        assertEquals(21L, result.getTotalElements());
-        assertEquals(10, result.getSize());
-        verify(productRepository, times(1)).findAllWithPaging(10, 0L);
-        verify(productRepository, times(1)).countAll();
+        // 取得したページ結果が null でないことを検証します
+        assertNotNull(resultPage);
+        // 1ページあたりの取得件数が指定通りの 10件 であることを検証します
+        assertEquals(10, resultPage.getContent().size());
+        // 初期データの全商品の総件数（21件）が正しく設定されていることを検証します
+        assertEquals(21L, resultPage.getTotalElements());
     }
 
     @Test
-    void findProducts_WithCategory_OK() {
-        // テストデータ
-        // カテゴリID指定（categoryId = 1：文房具）、ページング情報（size=10, page=0）
+    @DisplayName("findProductsByCategory: カテゴリID（1:文房具）が指定された場合、該当する商品がページング付きで取得できること")
+    void testFindProductsByCategory_WithCategory_OK() {
+        // 検索対象として初期データのカテゴリID「1（文房具）」を指定します
         Integer categoryId = 1;
+        // ページング条件（1ページ目、10件表示）を指定します
         Pageable pageable = PageRequest.of(0, 10);
-        List<Product> mockProducts = Arrays.asList(new Product()); // 該当カテゴリのモック商品データ
 
-        when(productRepository.findByCategoryIdWithPaging(eq(categoryId), anyInt(), anyLong()))
-                .thenReturn(mockProducts);
-        when(productRepository.countByCategoryId(categoryId)).thenReturn(14L); // 文房具の件数14件の前提
+        // カテゴリIDを指定してサービスクラスを実行します
+        Page<Product> resultPage = productService.findProductsByCategory(categoryId, pageable);
 
-        // テスト内容
-        // カテゴリ（文房具）を指定して商品一覧のページング処理を実行する
-        Page<Product> result = productService.findProductsByCategory(categoryId, pageable);
-
-        // 結果
-        // 返却されたPageオブジェクトがnullではなく、総件数の期待値14Lと実際の総要素数が一致すること
-        assertNotNull(result);
-        assertEquals(14L, result.getTotalElements());
-        verify(productRepository, times(1)).findByCategoryIdWithPaging(eq(categoryId), anyInt(), anyLong());
-        verify(productRepository, times(1)).countByCategoryId(categoryId);
+        // 取得したページ結果が null でないことを検証します
+        assertNotNull(resultPage);
+        // 1ページあたりの取得件数が指定通りの 10件 であることを検証します
+        assertEquals(10, resultPage.getContent().size());
+        // 初期データにおいて文房具に属する商品の総件数（14件）が正しく設定されていることを検証します
+        assertEquals(14L, resultPage.getTotalElements());
     }
 }

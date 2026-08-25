@@ -2,7 +2,7 @@ package com.example.fullness.stationary.entity;
 
 import java.io.Serializable;
 
-public class ProjectCategory implements Serializable {
+public class ProductCategory implements Serializable {
 
     private Integer id;
     private String name;

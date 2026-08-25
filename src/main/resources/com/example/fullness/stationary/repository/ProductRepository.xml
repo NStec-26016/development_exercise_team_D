@@ -34,4 +34,11 @@
         SELECT COUNT(*) FROM product WHERE product_category_id = #{categoryId}
     </select>
 
+    <!-- ▼ ProjectCategory を ProductCategory に修正済み -->
+    <select id="findAllCategories" resultType="com.example.fullness.stationary.entity.ProductCategory">
+        SELECT id, name 
+        FROM product_category 
+        ORDER BY id ASC
+    </select>
+
 </mapper>
