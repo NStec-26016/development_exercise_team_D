@@ -78,7 +78,7 @@ class ProductDeleteServiceTest {
         // Assert
         assertNotNull(result);
         assertEquals(productId, result.getId());
-        assertEquals("水性ボールペン（赤）", result.getName());
+        assertEquals("水性ボールペン(赤)", result.getName());
         assertEquals(120, result.getPrice());
         assertEquals(10, result.getStock());
         assertEquals("文房具", result.getCategoryName());

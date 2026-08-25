@@ -11,7 +11,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import com.example.fullness.stationary.entity.Product;
-import com.example.fullness.stationary.entity.ProductCategory;
 import com.example.fullness.stationary.service.ProductService;
 
 @Controller
