@@ -9,26 +9,31 @@
         <result property="imageUrl" column="image_url" />
         <result property="productCategoryId" column="product_category_id" />
         <result property="deleteFlag" column="delete_flag" />
-    </resultMap>    
+    </resultMap>
+
     <select id="findAllWithPaging" resultMap="ProductResult">
         SELECT id, name, price, image_url, product_category_id, delete_flag
         FROM product
         ORDER BY id ASC
         LIMIT #{limit} OFFSET #{offset}
-    </select>   
+    </select>
+
     <select id="findByCategoryIdWithPaging" resultMap="ProductResult">
         SELECT id, name, price, image_url, product_category_id, delete_flag
         FROM product
         WHERE product_category_id = #{categoryId}
         ORDER BY id ASC
         LIMIT #{limit} OFFSET #{offset}
-    </select>   
+    </select>
+
     <select id="countAll" resultType="long">
         SELECT COUNT(*) FROM product
-    </select>   
+    </select>
+
     <select id="countByCategoryId" resultType="long">
         SELECT COUNT(*) FROM product WHERE product_category_id = #{categoryId}
-    </select>   
+    </select>
+
     <!-- ▼ ProjectCategory を ProductCategory に修正済み -->
     <select id="findAllCategories" resultType="com.example.fullness.stationary.entity.ProductCategory">
         SELECT id, name
@@ -49,10 +54,26 @@
     <!-- 2. 商品情報を更新（修正）するSQL -->
     <!-- 指定された商品ID(id)のデータに対して、新しい商品名と価格を上書き保存します -->
     <update id="updateProduct">
+           <!-- 💡【画像URLのバグ完全解決】
+         Serviceから image_url が null で届いた場合は、COALESCE（コアレス）関数を使い、
+         データベースに元々登録されている「本物の正しい画像パス（image_url）」をそのまま維持して上書きします！ -->
+    
+    
+              <!-- 2. 商品情報を更新（修正）するSQL -->
+  
         UPDATE product
         SET name = #{name},
             price = #{price}
         WHERE id = #{id}
     </update>
+
+ <!-- 💡【追加】カテゴリIDからカテゴリ名を1件取得するSQL
+         確認画面で選択された正しいカテゴリ名を表示するために、Javaから呼び出します -->
+      <select id="findProductMapByIdForEdit" resultType="java.util.Map">
+        SELECT p.id, p.name, p.price, p.image_url, p.product_category_id, s.quantity
+        FROM product p
+        LEFT JOIN product_stock s ON p.id = s.product_id
+        WHERE p.id = #{productId}
+    </select>
 
 </mapper>

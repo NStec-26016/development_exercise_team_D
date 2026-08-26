@@ -1,4 +1,4 @@
--- ---- 1. 既存オブジェクトの削除（CASCADEなし、依存関係順） ----
+-- ---- 1. 既存オブジェクトの削除 ----
 drop table if exists order_detail;
 drop table if exists product_stock;
 drop table if exists product;
@@ -11,15 +11,13 @@ drop table if exists employee_account;
 drop table if exists employee;
 drop table if exists department;
 
--- ---- 2. テーブルの作成（SERIAL必須、手動シーケンスなし） ----
--- 部署
+-- ---- 2. テーブルの作成 ----
 create table department(
-    id serial, -- :o: SERIAL を使用（自動採番は1から開始）
+    id serial,
     name varchar(100) not null,
     PRIMARY KEY (id)
 );
 
--- 社員
 create table employee(
     id serial,
     department_id integer,
@@ -29,7 +27,6 @@ create table employee(
     FOREIGN KEY (department_id) REFERENCES department(id)
 );
 
--- 社員アカウント
 create table employee_account(
     id serial,
     employee_id integer,
@@ -41,7 +38,6 @@ create table employee_account(
     FOREIGN KEY (employee_id) REFERENCES employee(id)
 );
 
--- 顧客
 create table customer(
     id serial,
     name varchar(20) not null,
@@ -56,21 +52,18 @@ create table customer(
     PRIMARY KEY (id)
 );
 
--- 注文ステータス
 create table order_status(
     id serial,
     name varchar(100) not null,
     PRIMARY KEY (id)
 );
 
--- 支払方法
 create table payment_method(
     id serial,
     name varchar(100) not null,
     PRIMARY KEY(id)
 );
 
--- 注文
 create table orders(
     id serial,
     customer_id integer,
@@ -84,14 +77,12 @@ create table orders(
     FOREIGN KEY (payment_method_id) REFERENCES payment_method(id)
 );
 
--- 商品カテゴリー
 create table product_category(
     id serial,
     name varchar(20) not null,
     PRIMARY KEY(id)
 );
 
--- 商品テーブル
 create table product(
     id serial,
     product_category_id integer,
@@ -103,7 +94,6 @@ create table product(
     FOREIGN KEY(product_category_id) REFERENCES product_category(id)
 );
 
--- 商品在庫テーブル
 create table product_stock(
     id serial,
     product_id integer,
@@ -112,7 +102,6 @@ create table product_stock(
     FOREIGN KEY (product_id) REFERENCES product(id)
 );
 
--- 注文明細
 create table order_detail(
     id serial,
     order_id integer,
@@ -125,80 +114,35 @@ create table order_detail(
     FOREIGN KEY (customer_id) REFERENCES customer (id)
 );
 
--- ---- 3. 初期データの投入（SERIALのルールに従う） ----
--- 部署（自動的に id = 1 で登録される）
-insert into department (name) values ('人事部');
-insert into department (name) values ('営業部');
-insert into department (name) values ('人材戦略部');
-insert into department (name) values ('管理部');
-insert into department (name) values ('統括部');
-
--- 社員（自動的に id = 1 で登録。部署IDには上で生成された「1」を指定）
-insert into employee (department_id, name, name_kana) values (1, '丸本翔太郎', 'マルモトショウタロウ');
-insert into employee (department_id, name, name_kana) values (3, '石川太郎', 'イシカワタロウ');
-insert into employee (department_id, name, name_kana) values (5, '鈴木太郎', 'スズキタロウ');
-insert into employee (department_id, name, name_kana) values (3, '渡辺太郎', 'ワタナベタロウ');
-insert into employee (department_id, name, name_kana) values (1, '佐藤太郎', 'サトウタロウ');
-insert into employee (department_id, name, name_kana) values (4, '田中太郎', 'タナカタロウ');
-
-
--- 結合テストロックかかった時の解除用SQL
-delete from employee_account where employee_id = 1;
-delete from employee_account where employee_id = 2;
-delete from employee_account where employee_id = 3;
-
--- 社員アカウント（自動的に id = 1 で登録。社員IDには上で生成された「1」を指定）
--- insert into employee_account (employee_id, name, password) values (1, '丸ちゃん', '$2a$10$wO3l2UiwZ3U13B0r8G9T2O6ZfL3r2zWjR3M7q6Nn/y5u8u7xMvKy6');
-insert into employee_account (employee_id, name, password) values (1, 'marumoto', 'maru1');
-insert into employee_account (employee_id, name, password) values (2, 'ishikawa001', 'pass001');
-insert into employee_account (employee_id, name, password) values (3, 'suzuki003', 'pass002');-- ---- テスト用：商品カテゴリーの挿入 ----
-insert into product_category (name) values ('筆記具');
-insert into product_category (name) values ('ノート・紙製品');
-
--- ---- テスト用：商品の挿入（product_category_id: 1=筆記具, 2=ノート） ----
--- idは自動採番（SERIAL）されます
-insert into product (product_category_id, name, price, image_url, delete_flag) 
-values (1, '高級ボールペン', 1200, 'images/pen1.jpeg', 0);
-
-insert into product (product_category_id, name, price, image_url, delete_flag) 
-values (1, 'シャープペンシル', 500, 'images/sharp1.jpeg', 0);
-
-insert into product (product_category_id, name, price, image_url, delete_flag) 
-values (2, '方眼ノート A5', 250, 'images/note1.jpeg', 0);
-insert into employee_account (employee_id, name, password) values (3, 'suzuki003', 'pass002');
-
--- 商品カテゴリー(product_category)テーブルに以下の要素を登録
-insert into product_category (name) values ('家電');
-
--- ---- テスト用：商品在庫の挿入（product_id: 1, 2, 3 に対応） ----
-insert into product_stock (product_id, quantity) values (1, 50);
-insert into product_stock (product_id, quantity) values (2, 100);
-insert into product_stock (product_id, quantity) values (3, 200);
+-- ---- 3. 初期データの投入 ----
+insert into department (name) values ('人事部'), ('営業部'), ('人材戦略部'), ('管理部'), ('統括部');
+insert into employee (department_id, name, name_kana) values (1, '丸本翔太郎', 'マルモトショウタロウ'), (3, '石川太郎', 'イシカワタロウ'), (5, '鈴木太郎', 'スズキタロウ'), (3, '渡辺太郎', 'ワタナベタロウ'), (1, '佐藤太郎', 'サトウタロウ'), (4, '田中太郎', 'タナカタロウ');
+insert into employee_account (employee_id, name, password) values (1, 'marumoto', 'maru1'), (2, 'ishikawa001', 'pass001'), (3, 'suzuki003', 'pass002');
 
 insert into product_category (name) values ('文房具'), ('ガジェット'), ('ファッション'), ('日用品');
 
 insert into product (product_category_id, name, price, image_url, delete_flag) values
-(1, '黒筆ペン', 250, 'images/black_fudepen.jpg', 0),
-(1, '黒ボールペン（太字）', 150, 'images/black_pen_o.jpg', 0),
-(1, '黒ボールペン（細字）', 150, 'images/black_pen_w.jpg', 0),
-(1, '黒ボールペン', 120, 'images/black_pen.jpg', 0),
-(1, '青マーカー', 180, 'images/blue_maker.jpg', 0),
-(1, '青筆ペン', 250, 'images/blue_fudepen.jpg', 0),
-(1, '青ボールペン（太字）', 150, 'images/blue_pen_o.jpg', 0),
-(1, '青ボールペン（細字）', 150, 'images/blue_pen_w.jpg', 0),
-(1, 'カラーペン 12色', 800, 'images/color_pen12.jpg', 0),
-(1, 'カラーペン 48色', 2800, 'images/color_pen48.jpg', 0),
-(1, '緑マーカー', 180, 'images/green_maker.jpg', 0),
-(1, '黄色マーカー', 180, 'images/yellow_maker.jpg', 0),
-(1, '赤ボールペン', 120, 'images/red_pen.jpg', 0),
-(1, '赤ボールペン（太字）', 150, 'images/red_pen_o.jpg', 0),
-(2, 'マウス A', 2980, 'images/mouse_a.jpg', 0),
-(2, 'マウス B', 3480, 'images/mouse_b.jpg', 0),
-(2, 'マウス C', 2500, 'images/mouse_c.jpg', 0),
-(2, 'マウス D', 2700, 'images/mouse_d.jpg', 0),
-(3, 'トートバッグ', 4500, 'images/bag.jpg', 0),
-(4, 'マスク', 1000, 'images/mask.jpg', 0),
-(4, '傘', 2200, 'images/umbrella.jpg', 0);
+(1, '黒筆ペン', 250, '/images/black_fudepen.jpg', 0),
+(1, '黒ボールペン（太字）', 150, '/images/black_pen_o.jpg', 0),
+(1, '黒ボールペン（細字）', 150, '/images/black_pen_w.jpeg', 0), -- ここだけ .jpeg
+(1, '黒ボールペン', 120, '/images/black_pen.jpg', 0),
+(1, '青マーカー', 180, '/images/blue_maker.jpg', 0),
+(1, '青筆ペン', 250, '/images/blue_fudepen.jpg', 0), -- ファイルがないので表示されません
+(1, '青ボールペン（太字）', 150, '/images/blue_pen_o.jpg', 0),
+(1, '青ボールペン（細字）', 150, '/images/blue_pen_w.jpeg', 0), -- ここだけ .jpeg
+(1, 'カラーペン 12色', 800, '/images/color_pen12.jpeg', 0), -- ここだけ .jpeg
+(1, 'カラーペン 48色', 2800, '/images/color_pen48.jpeg', 0), -- ここだけ .jpeg
+(1, '緑マーカー', 180, '/images/green_maker.jpg', 0),
+(1, '黄色マーカー', 180, '/images/yellow_maker.jpg', 0),
+(1, '赤ボールペン', 120, '/images/red_pen.jpg', 0),
+(1, '赤ボールペン（太字）', 150, '/images/red_pen_o.jpg', 0),
+(2, 'マウス A', 2980, '/images/mouse_a.jpg', 0),
+(2, 'マウス B', 3480, '/images/mouse_b.jpg', 0),
+(2, 'マウス C', 2500, '/images/mouse_c.jpg', 0),
+(2, 'マウス D', 2700, '/images/mouse_d.jpg', 0),
+(3, 'トートバッグ', 4500, '/images/bag.jpg', 0),
+(4, 'マスク', 1000, '/images/mask.jpg', 0),
+(4, '傘', 2200, '/images/umbrella.jpg', 0);
 
 insert into product_stock (product_id, quantity)
 select i, 20 from generate_series(1, 21) as s(i);

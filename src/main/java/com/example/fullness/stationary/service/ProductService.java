@@ -38,6 +38,9 @@ public class ProductService {
         product.setName(form.getName());
         product.setPrice(form.getPrice());
 
+        // 💡【追加】入力画面から届いた画像URL（imagePath）をエンティティの imageUrl へ確実に引き渡します！
+        product.setImageUrl(form.getImagePath());
+
         productRepository.updateProduct(product);
 
         // 2. 在庫情報の更新（formから取得した在庫数を反映）

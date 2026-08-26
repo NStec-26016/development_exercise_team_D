@@ -3,9 +3,9 @@
 <mapper namespace="com.example.fullness.stationary.repository.ProductStockRepository">
 
     <!-- 商品IDをキーにして、在庫数を上書き更新するSQL -->
-    <update id="updateStock">
+     <update id="updateStock">
         UPDATE product_stock
-        SET stock = #{stock}
+        SET quantity = #{stock}
         WHERE product_id = #{productId}
     </update>
 

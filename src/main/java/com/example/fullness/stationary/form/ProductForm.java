@@ -26,4 +26,8 @@ public class ProductForm {
     /** 在庫数（追加） */
     private Integer stock;
 
+    // UC12で追加
+    private String imagePath;
+
+    private Integer categoryId;
 }
