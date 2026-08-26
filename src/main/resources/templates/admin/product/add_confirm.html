@@ -32,7 +32,7 @@
                         <td th:text="${form.categoryName}"></td>
                     </tr>
                 </tbody>
-            </table> <img th:src="@{${form.imagePath}}" th:alt="${form.name}" class="img-fluid mb-4"
+            </table> <img th:src="@{${form.imageUrl}}" th:alt="${form.name}" class="img-fluid mb-4"
                 style="max-height: 160px;">
             <form th:action="@{/admin/product/add/confirm}" method="post"> <a th:href="@{/admin/product}"
                     class="btn btn-link link-fs">キャンセル</a> <button type="submit" name="action" value="back"

@@ -32,7 +32,7 @@ public class ProductDeleteController {
         // DTOをServiceから取得
         ProductDetailDto productDetail = productService.getProductDetail(productId);
 
-        // HTML側が「product.imagePath」や「product.categoryName」を探せるように、DTOを丸ごと渡す
+        // HTML側が「product.imageUrl」や「product.categoryName」を探せるように、DTOを丸ごと渡す
         model.addAttribute("product", productDetail);
 
         return "admin/product/delete_confirm";

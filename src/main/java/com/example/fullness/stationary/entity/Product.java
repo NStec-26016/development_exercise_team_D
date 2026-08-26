@@ -19,4 +19,5 @@ public class Product implements Serializable {
     private Integer deleteFlag;
 
     private Integer stock; // ★ 追加
+
 }

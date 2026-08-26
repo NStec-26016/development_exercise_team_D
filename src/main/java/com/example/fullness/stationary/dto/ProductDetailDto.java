@@ -9,6 +9,6 @@ public class ProductDetailDto {
     private Integer price;
     private Integer stock;
     private String categoryName;
-    private String imagePath;
+    private String imageUrl;
 
 }

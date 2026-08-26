@@ -34,7 +34,7 @@ public class ProductRegistrationController {
     @ModelAttribute("form")
     public ProductRegistrationForm setUpForm() {
         ProductRegistrationForm form = new ProductRegistrationForm();
-        form.setImagePath("/images/Shop_Img1.jpeg"); // 画像nullクラッシュ防止
+        form.setImageUrl("/images/Shop_Img1.jpeg"); // 画像nullクラッシュ防止
         form.setCategoryName("");
         form.setName("");
         form.setCategoryId(0); // selected判定のnull安全対策
@@ -79,7 +79,7 @@ public class ProductRegistrationController {
                 result.rejectValue("image", "invalidFormat", "正しい画像形式でアップロードしてください");
             } else {
                 // 💡【追加行①】確認画面の th:src に渡すために、選択されたファイル名（例: bag.jpg）をセットします
-                form.setImagePath("/images/" + file.getOriginalFilename());
+                form.setImageUrl("/images/" + file.getOriginalFilename());
             }
         }
 

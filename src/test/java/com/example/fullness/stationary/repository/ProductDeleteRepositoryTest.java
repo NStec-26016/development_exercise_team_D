@@ -41,7 +41,7 @@ class ProductDeleteRepositoryTest {
         assertEquals(120, result.getPrice());
         assertEquals(10, result.getStock());
         assertEquals("文房具", result.getCategoryName());
-        assertEquals("red.pen_w.jpg", result.getImagePath());
+        assertEquals("red.pen_w.jpg", result.getimageUrl());
     }
 
     @Test
