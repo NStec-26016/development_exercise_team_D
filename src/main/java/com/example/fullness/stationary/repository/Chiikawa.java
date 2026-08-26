@@ -9,20 +9,7 @@ import com.example.fullness.stationary.entity.Product;
 import com.example.fullness.stationary.entity.ProductCategory;
 
 @Mapper
-public interface ProductRepository {
-
-    List<Product> findAllWithPaging(@Param("limit") int limit, @Param("offset") long offset);
-
-    long countAll();
-
-    List<Product> findByCategoryIdWithPaging(@Param("product_category_id") Integer product_category_id,
-            @Param("limit") int limit,
-            @Param("offset") long offset);
-
-    long countByCategoryId(@Param("product_category_id") Integer product_category_id);
-
-    // 全カテゴリを取得するメソッド
-    List<ProductCategory> findAllCategories();
+public interface Chiikawa {
 
     // ↓↓↓ここからUC12
     /**

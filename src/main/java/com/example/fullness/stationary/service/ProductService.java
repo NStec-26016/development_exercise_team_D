@@ -6,14 +6,14 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.example.fullness.stationary.entity.Product;
 import com.example.fullness.stationary.form.ProductForm;
-import com.example.fullness.stationary.repository.ProductRepository;
+import com.example.fullness.stationary.repository.Chiikawa;
 import com.example.fullness.stationary.repository.ProductStockRepository; // 💡追加：在庫リポジトリのインポート
 
 @Service
 public class ProductService {
 
     @Autowired
-    private ProductRepository productRepository;
+    private Chiikawa chikawa;
 
     @Autowired
     private ProductStockRepository productStockRepository; // 💡追加：在庫用リポジトリを注入
@@ -22,7 +22,7 @@ public class ProductService {
      * 商品名がすでに登録されているかチェックする（重複チェック用）
      */
     public boolean isProductNameExists(String name) {
-        Product product = productRepository.findByName(name);
+        Product product = chikawa.findByName(name);
         return product != null;
     }
 
@@ -42,7 +42,7 @@ public class ProductService {
         // 💡【追加】入力画面から届いた画像URL（imageUrl）をエンティティの imageUrl へ確実に引き渡します！
         // product.setImageUrl(form.getImageUrl());
 
-        productRepository.updateProduct(product);
+        chikawa.updateProduct(product);
 
         // 2. 在庫情報の更新（formから取得した在庫数を反映）
         // 💡重要：前述の通り、ProductFormクラスに「private Integer stock;」を追加しておいてください。

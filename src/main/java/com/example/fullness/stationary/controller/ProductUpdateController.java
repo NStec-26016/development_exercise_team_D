@@ -220,7 +220,7 @@ public class ProductUpdateController {
         if (form.getCategoryId() != null) {
             try {
                 String realCategoryName = sqlSession
-                        .getMapper(com.example.fullness.stationary.repository.ProductRepository.class)
+                        .getMapper(com.example.fullness.stationary.repository.Chiikawa.class)
                         .findCategoryNameById(form.getCategoryId());
                 confirmForm.setCategoryName(realCategoryName);
             } catch (Exception e) {
