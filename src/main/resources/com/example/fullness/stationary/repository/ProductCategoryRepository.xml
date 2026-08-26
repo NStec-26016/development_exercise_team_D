@@ -28,4 +28,10 @@
             name = #{name}
     </select>
 
+     <select id="findAllByOrderByCategoryIdAsc" resultMap="ProductCategoryResult">
+        SELECT id, name
+        FROM product_category
+        ORDER BY id ASC
+    </select>
+
 </mapper>

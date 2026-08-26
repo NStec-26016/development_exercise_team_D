@@ -10,11 +10,9 @@
 
 <body>
     <div th:replace="~{admin/fragments/layout :: header}"></div>
-
     <main class="container">
         <div class="admin-panel p-4 mx-auto text-center" style="max-width: 480px;">
             <h1 class="mb-4">新商品登録(確認)</h1>
-
             <table class="table text-start">
                 <tbody>
                     <tr>
@@ -34,17 +32,27 @@
                         <td th:text="${form.categoryName}"></td>
                     </tr>
                 </tbody>
-            </table>
-            <img th:src="@{${form.imageUrl}}" th:alt="${form.name}" class="img-fluid mb-4" style="max-height: 160px;">
+                <<<<<<< HEAD </table>
+                    <img th:src="@{${form.imageUrl}}" th:alt="${form.name}" class="img-fluid mb-4"
+                        style="max-height: 160px;">
 
-            <form th:action="@{/admin/product/add/confirm}" method="post">
-                <a th:href="@{/admin/product}" class="btn btn-link link-fs">キャンセル</a>
-                <button type="submit" name="action" value="back" class="btn btn-fs px-4">戻る</button>
-                <button type="submit" name="action" value="complete" class="btn btn-fs-solid px-4">完了</button>
-            </form>
+                    <form th:action="@{/admin/product/add/confirm}" method="post">
+                        <a th:href="@{/admin/product}" class="btn btn-link link-fs">キャンセル</a>
+                        <button type="submit" name="action" value="back" class="btn btn-fs px-4">戻る</button>
+                        <button type="submit" name="action" value="complete" class="btn btn-fs-solid px-4">完了</button>
+                    </form>
         </div>
     </main>
 
+    =======
+    </table> <img th:src="@{${form.imageUrl}}" th:alt="${form.name}" class="img-fluid mb-4" style="max-height: 160px;">
+    <form th:action="@{/admin/product/add/confirm}" method="post"> <a th:href="@{/admin/product}"
+            class="btn btn-link link-fs">キャンセル</a> <button type="submit" name="action" value="back"
+            class="btn btn-fs px-4">戻る</button> <button type="submit" name="action" value="complete"
+            class="btn btn-fs-solid px-4">完了</button> </form>
+    </div>
+    </main>
+    >>>>>>> origin/UC11_riko
     <div th:replace="~{admin/fragments/layout :: footer}"></div>
 </body>
 

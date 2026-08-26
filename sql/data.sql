@@ -121,10 +121,10 @@ insert into employee_account (employee_id, name, password) values (1, 'marumoto'
 
 insert into product_category (name) values ('文房具'), ('ガジェット'), ('ファッション'), ('日用品');
 
-insert into product (product_category_id, name, price, image_url, delete_flag) values
+insert into product (product_category_id, name, price, image_url, delete_flag) values 
 (1, '黒筆ペン', 250, '/images/black_fudepen.jpg', 0),
 (1, '黒ボールペン（太字）', 150, '/images/black_pen_o.jpg', 0),
-(1, '黒ボールペン（細字）', 150, '/images/black_pen_w.jpeg', 0), -- ここだけ .jpeg
+(1, '黒ボールペン（細字）', 150, '/images/black_pen_w.jpg', 0), 
 (1, '黒ボールペン', 120, '/images/black_pen.jpg', 0),
 (1, '青マーカー', 180, '/images/blue_maker.jpg', 0),
 (1, '青筆ペン', 250, '/images/blue_fudepen.jpg', 0), -- ファイルがないので表示されません
