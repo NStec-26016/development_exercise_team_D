@@ -26,13 +26,9 @@ import java.util.Map;
 
 /**
  * 商品修正（変更）機能に関わるすべての不具合を完全駆逐した最終版コントローラークラス。
- * 💡初期表示でのDBデータ連動、戻るボタンの安全な値保持遷移、確認画面でのカテゴリ名同期を100%実現します。
- * 
- * @author フルネス文具 開発チームD
- * @version 1.0
  */
 @Controller
-@RequestMapping("/admin/product")
+@RequestMapping("/admin/product/edit") // 💡/edit までをこのクラスの縄張りにします
 public class ProductUpdateController {
 
     private final ProductService productService;
@@ -74,7 +70,7 @@ public class ProductUpdateController {
     }
 
     /**
-     * データベースの本物のカテゴリ一覧を直接引っ張ってきて画面（Thymeleaf）へセットします。
+     * カテゴリ一覧を画面へセット
      */
     private void addCategoriesMock(Model model) {
         try {
@@ -94,9 +90,8 @@ public class ProductUpdateController {
 
     /**
      * 1. 商品修正入力画面の初期表示
-     * 💡【バグ完全修正】固定のダミー値を全廃し、URLのIDを元にDBから本物のデータを引き出して表示します！
      */
-    @GetMapping("/edit/{productId}")
+    @GetMapping("/{productId}")
     public String showEditForm(
             @PathVariable("productId") Integer productId,
             RedirectAttributes redirectAttributes,
@@ -105,12 +100,10 @@ public class ProductUpdateController {
 
         addCategoriesMock(model);
 
-        // 💡【戻るボタン】確認画面から戻ってきた場合は、モデル内のデータを最優先で使用
         if (model.containsAttribute("form")) {
             return "admin/product/edit_form";
         }
 
-        // セッションキャッシュにデータが残っている場合もそれを復元
         ProductForm cachedForm = (ProductForm) session.getAttribute("scopedFormCache");
         if (cachedForm != null && cachedForm.getId() != null && cachedForm.getId().equals(productId)) {
             model.addAttribute("form", cachedForm);
@@ -118,14 +111,11 @@ public class ProductUpdateController {
         }
 
         if (productId == null) {
-            return "redirect:/admin/product/list";
+            return "redirect:/admin/product";
         }
 
-        // 💡【本物の初期データ取得ロジック】
-        // データベース（productテーブルとproduct_stockテーブル）から、現在登録されている本物の情報を直接抽出します！
         ThymeleafExtendedForm form = new ThymeleafExtendedForm();
         try {
-            // 既存のMyBatis接続を活用し、修正対象の商品データをダイレクトにMapで取得
             Map<String, Object> dbProduct = sqlSession.selectOne(
                     "com.example.fullness.stationary.repository.ProductRepository.findProductMapByIdForEdit",
                     productId);
@@ -135,18 +125,17 @@ public class ProductUpdateController {
                 form.setName((String) dbProduct.get("name"));
                 form.setPrice(((Number) dbProduct.get("price")).intValue());
                 form.setStock(dbProduct.get("quantity") != null ? ((Number) dbProduct.get("quantity")).intValue() : 0);
-                form.setImagePath(dbProduct.get("image_url") != null ? (String) dbProduct.get("image_url")
+                form.setImageUrl(dbProduct.get("image_url") != null ? (String) dbProduct.get("image_url")
                         : "/images/Shop_Img1.jpeg");
                 form.setCategoryId(dbProduct.get("product_category_id") != null
                         ? ((Number) dbProduct.get("product_category_id")).intValue()
                         : 1);
             } else {
-                // 万が一レコードが見つからない場合の安全な初期化
                 form.setId(productId);
                 form.setName("商品 " + productId);
                 form.setPrice(100);
                 form.setStock(10);
-                form.setImagePath("/images/Shop_Img1.jpeg");
+                form.setImageUrl("/images/Shop_Img1.jpeg");
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -154,7 +143,7 @@ public class ProductUpdateController {
             form.setName("商品レコード " + productId);
             form.setPrice(120);
             form.setStock(50);
-            form.setImagePath("/images/Shop_Img1.jpeg");
+            form.setImageUrl("/images/Shop_Img1.jpeg");
         }
 
         model.addAttribute("form", form);
@@ -162,9 +151,9 @@ public class ProductUpdateController {
     }
 
     /**
-     * 2. 入力画面で「完了」が押されたとき（バリデーション＆重複チェック）
+     * 2. 入力画面で「完了」が押されたとき
      */
-    @PostMapping("/edit/{productId}")
+    @PostMapping("/{productId}")
     public String verify(
             @PathVariable("productId") Integer productId,
             @Validated @ModelAttribute("form") ProductForm form,
@@ -190,7 +179,7 @@ public class ProductUpdateController {
             errorForm.setName(form.getName());
             errorForm.setPrice(form.getPrice());
             errorForm.setStock(form.getStock());
-            errorForm.setImagePath(form.getImagePath());
+            errorForm.setImageUrl(form.getImageUrl());
             errorForm.setCategoryId(form.getCategoryId());
 
             model.addAttribute("form", errorForm);
@@ -198,7 +187,6 @@ public class ProductUpdateController {
             return "admin/product/edit_form";
         }
 
-        // 入力された最新のデータをセッションへ退避（戻るボタン対策）
         session.setAttribute("scopedFormCache", form);
         redirectAttributes.addFlashAttribute("form", form);
         return "redirect:/admin/product/edit/confirm";
@@ -206,9 +194,8 @@ public class ProductUpdateController {
 
     /**
      * 3. 商品確認画面の表示（GET）
-     * 💡【バグ完全修正】選んだカテゴリIDから本物のカテゴリ名を取得し、固定表示を完全に消し去ります！
      */
-    @GetMapping("/edit/confirm")
+    @GetMapping("/confirm")
     public String showConfirmPage(RedirectAttributes redirectAttributes, HttpSession session, Model model) {
         ProductForm form = (ProductForm) model.getAttribute("form");
 
@@ -216,7 +203,7 @@ public class ProductUpdateController {
             form = (ProductForm) session.getAttribute("scopedFormCache");
         }
         if (form == null || form.getName() == null) {
-            return "redirect:/admin/product/edit/{productId}";
+            return "redirect:/admin/product/edit/" + (form != null ? form.getId() : "");
         }
 
         addCategoriesMock(model);
@@ -227,10 +214,9 @@ public class ProductUpdateController {
         confirmForm.setPrice(form.getPrice());
         confirmForm.setRemarks(form.getRemarks());
         confirmForm.setStock(form.getStock());
-        confirmForm.setImagePath(form.getImagePath());
-        confirmForm.setCategoryId(form.getCategoryId()); // 💡カテゴリIDを確実にコピー
+        confirmForm.setImageUrl(form.getImageUrl());
+        confirmForm.setCategoryId(form.getCategoryId());
 
-        // 💡【プルダウン連動バグ修正】選択されたカテゴリIDから、本物のカテゴリ名をDBから直接取得して確認画面へセットします！
         if (form.getCategoryId() != null) {
             try {
                 String realCategoryName = sqlSession
@@ -248,9 +234,27 @@ public class ProductUpdateController {
     }
 
     /**
-     * 4. 確認画面で「登録（完了）」または「戻る」が押されたとき（POST）
+     * 3.5 【HTML変更なし対応】確認画面で「戻る」が通常のGETリンク（?action=back）だった場合
+     * 💡params属性を指定することで、Spring起動時のマッピング重複エラーを完全に防止しました！
      */
-    @PostMapping("/edit/confirm")
+    @GetMapping(value = "/confirm", params = "action=back")
+    public String confirmGet(
+            @RequestParam(value = "action", required = false) String action,
+            HttpSession session,
+            RedirectAttributes redirectAttributes) {
+
+        ProductForm form = (ProductForm) session.getAttribute("scopedFormCache");
+        if (form != null) {
+            redirectAttributes.addFlashAttribute("form", form);
+            return "redirect:/admin/product/edit/" + form.getId(); // 値を保持して戻る
+        }
+        return "redirect:/admin/product";
+    }
+
+    /**
+     * 4. 確認画面で「登録」または「戻る」が押されたとき（POST）
+     */
+    @PostMapping("/confirm")
     public String confirm(
             @RequestParam(value = "action", required = false) String action,
             HttpSession session,
@@ -258,12 +262,9 @@ public class ProductUpdateController {
 
         ProductForm form = (ProductForm) session.getAttribute("scopedFormCache");
         if (form == null) {
-            return "redirect:/admin/product/edit/";
+            return "redirect:/admin/product";
         }
 
-        // 💡【戻るボタン不具合修正】
-        // 戻るボタンが押された場合、セッションのキャッシュを維持したまま、
-        // フラッシュ属性に入力データを詰めて元の入力画面のURLへ安全に誘導します！
         if ("back".equals(action)) {
             redirectAttributes.addFlashAttribute("form", form);
             return "redirect:/admin/product/edit/" + form.getId();
@@ -271,7 +272,7 @@ public class ProductUpdateController {
 
         try {
             productService.updateProduct(form);
-            session.removeAttribute("scopedFormCache"); // 登録完了後はキャッシュをクリア
+            session.removeAttribute("scopedFormCache"); // キャッシュクリア
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -281,13 +282,24 @@ public class ProductUpdateController {
     }
 
     /*** 5. 商品修正完了画面の表示 */
-    @GetMapping("/edit/complete")
+    @GetMapping("/complete")
     public String showCompletePage(RedirectAttributes redirectAttributes, Model model) {
         String productName = (String) model.getAttribute("productName");
         if (productName == null || productName.trim().isEmpty()) {
-            return "redirect:/admin/product/edit/{productId}";
+            return "redirect:/admin/product";
         }
         model.addAttribute("productName", " " + productName + " ");
         return "admin/product/edit_complete";
     }
+
+    /**
+     * 6. 【HTML変更なし対応】完了画面から「商品検索へ戻る」が押されたとき
+     * 💡完了画面のボタンがこのクラスの管轄内（/complete/backなど）を呼んでいた場合、
+     * 安全に本来の商品検索一覧画面へリダイレクトさせます。
+     */
+    @GetMapping("/complete/back") // 💡HTML側のリンクが /complete/back やパラメータ付きだった場合に待ち受けます
+    public String returnToProductListFromComplete() {
+        return "redirect:/admin/product";
+    }
+
 }

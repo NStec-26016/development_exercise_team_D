@@ -44,7 +44,7 @@ public interface ProductRepository {
     String findCategoryNameById(@Param("categoryId") Integer categoryId);
 
     // 💡【この1行を追加！】
-    // Serviceを完全に迂回し、画像URL（imagePath）が入ったFormデータを直接MyBatisに届ける新しい武器です！
+    // Serviceを完全に迂回し、画像URL（imageUrl）が入ったFormデータを直接MyBatisに届ける新しい武器です！
     void updateProductDirectFromForm(@Param("form") com.example.fullness.stationary.form.ProductForm form);
 
 }

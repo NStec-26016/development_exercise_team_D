@@ -39,8 +39,8 @@ public class ProductService {
         product.setPrice(form.getPrice());
         product.setProductCategoryId(form.getCategoryId());
 
-        // 💡【追加】入力画面から届いた画像URL（imagePath）をエンティティの imageUrl へ確実に引き渡します！
-        // product.setImageUrl(form.getImagePath());
+        // 💡【追加】入力画面から届いた画像URL（imageUrl）をエンティティの imageUrl へ確実に引き渡します！
+        // product.setImageUrl(form.getImageUrl());
 
         productRepository.updateProduct(product);
 

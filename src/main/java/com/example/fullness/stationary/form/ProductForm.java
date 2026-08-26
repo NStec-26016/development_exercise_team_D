@@ -27,7 +27,7 @@ public class ProductForm {
     private Integer stock;
 
     // UC12で追加
-    private String imagePath;
+    private String imageUrl;
 
     private Integer categoryId;
 }
