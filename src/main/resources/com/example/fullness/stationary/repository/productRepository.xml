@@ -61,9 +61,11 @@
     
               <!-- 2. 商品情報を更新（修正）するSQL -->
   
-        UPDATE product
-        SET name = #{name},
-            price = #{price}
+         UPDATE product
+         SET name = #{name},
+            price = #{price},
+            product_category_id = #{productCategoryId}, <!-- 💡エンティティの変数名（大文字小文字も完全同期） -->
+            image_url = #{imageUrl}                    <!-- 💡エンティティの変数名（大文字小文字も完全同期） -->
         WHERE id = #{id}
     </update>
 
@@ -74,6 +76,11 @@
         FROM product p
         LEFT JOIN product_stock s ON p.id = s.product_id
         WHERE p.id = #{productId}
+    </select>
+     <select id="findCategoryNameById" resultType="string">
+        SELECT name
+        FROM product_category
+        WHERE id = #{categoryId}
     </select>
 
 </mapper>

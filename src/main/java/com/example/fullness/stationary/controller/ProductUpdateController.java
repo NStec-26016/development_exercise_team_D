@@ -105,7 +105,7 @@ public class ProductUpdateController {
 
         addCategoriesMock(model);
 
-        // 💡【戻るボタン不具合修正】確認画面から戻ってきた場合は、モデル内のデータを最優先で使用
+        // 💡【戻るボタン】確認画面から戻ってきた場合は、モデル内のデータを最優先で使用
         if (model.containsAttribute("form")) {
             return "admin/product/edit_form";
         }
@@ -216,7 +216,7 @@ public class ProductUpdateController {
             form = (ProductForm) session.getAttribute("scopedFormCache");
         }
         if (form == null || form.getName() == null) {
-            return "redirect:/admin/product/edit/1";
+            return "redirect:/admin/product/edit/{productId}";
         }
 
         addCategoriesMock(model);
@@ -258,7 +258,7 @@ public class ProductUpdateController {
 
         ProductForm form = (ProductForm) session.getAttribute("scopedFormCache");
         if (form == null) {
-            return "redirect:/admin/product/edit/1";
+            return "redirect:/admin/product/edit/";
         }
 
         // 💡【戻るボタン不具合修正】
@@ -285,7 +285,7 @@ public class ProductUpdateController {
     public String showCompletePage(RedirectAttributes redirectAttributes, Model model) {
         String productName = (String) model.getAttribute("productName");
         if (productName == null || productName.trim().isEmpty()) {
-            return "redirect:/admin/product/edit/1";
+            return "redirect:/admin/product/edit/{productId}";
         }
         model.addAttribute("productName", " " + productName + " ");
         return "admin/product/edit_complete";
