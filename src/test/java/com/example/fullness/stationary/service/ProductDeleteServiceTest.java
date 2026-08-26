@@ -68,7 +68,7 @@ class ProductDeleteServiceTest {
         mockDto.setPrice(120);
         mockDto.setStock(10);
         mockDto.setCategoryName("文房具");
-        mockDto.setimageUrl("red.pen_w.jpg");
+        mockDto.setImageUrl("red.pen_w.jpg");
 
         when(productDeleteRepository.findProductDetailById(productId)).thenReturn(mockDto);
 
@@ -82,7 +82,7 @@ class ProductDeleteServiceTest {
         assertEquals(120, result.getPrice());
         assertEquals(10, result.getStock());
         assertEquals("文房具", result.getCategoryName());
-        assertEquals("red.pen_w.jpg", result.getimageUrl());
+        assertEquals("red.pen_w.jpg", result.getImageUrl());
         verify(productDeleteRepository, times(1)).findProductDetailById(productId);
     }
 
