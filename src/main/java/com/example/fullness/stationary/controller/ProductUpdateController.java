@@ -15,6 +15,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.example.fullness.stationary.form.ProductForm;
+import com.example.fullness.stationary.service.HachiwareService;
 import com.example.fullness.stationary.service.ProductService;
 
 import jakarta.servlet.http.HttpSession;
@@ -31,13 +32,13 @@ import java.util.Map;
 @RequestMapping("/admin/product/edit") // 💡/edit までをこのクラスの縄張りにします
 public class ProductUpdateController {
 
-    private final ProductService productService;
+    private final HachiwareService hachiwareService;
 
     @Autowired
     private org.apache.ibatis.session.SqlSession sqlSession;
 
-    public ProductUpdateController(ProductService productService) {
-        this.productService = productService;
+    public ProductUpdateController(HachiwareService hachiwareService) {
+        this.hachiwareService = hachiwareService;
     }
 
     /**
@@ -271,7 +272,7 @@ public class ProductUpdateController {
         }
 
         try {
-            productService.updateProduct(form);
+            hachiwareService.updateProduct(form);
             session.removeAttribute("scopedFormCache"); // キャッシュクリア
         } catch (Exception e) {
             e.printStackTrace();
