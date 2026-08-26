@@ -6,7 +6,7 @@
 
 <insert id="insertProductRegistration" parameterType="com.example.fullness.stationary.entity.Product">
     INSERT INTO product (
-            product_category_id,
+            categoryId,
             name,
             price,
             image_url,

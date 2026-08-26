@@ -15,12 +15,11 @@ public interface ProductRepository {
 
     long countAll();
 
-        Lis
-
-    <Pro         @Param("limit") int limit,
+    List<Product> findByCategoryIdWithPaging(@Param("categoryId") Integer categoryId,
+            @Param("limit") int limit,
             @Param("offset") long offset);
 
-    long countByCategoryId(@Param("product_category_id") Integer product_category_id);
+    long countByCategoryId(@Param("categoryId") Integer categoryId);
 
     // 全カテゴリを取得するメソッド
     List<ProductCategory> findAllCategories();

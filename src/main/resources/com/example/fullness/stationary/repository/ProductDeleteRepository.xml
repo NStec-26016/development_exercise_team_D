@@ -5,7 +5,7 @@
  <select id="findById" resultType="com.example.fullness.stationary.entity.Product">
         SELECT 
             id,              
-            product_category_id,
+            categoryId,
             name,
             price,     
             image_url,
@@ -27,7 +27,7 @@
         FROM 
             product p
         INNER JOIN 
-            product_category c ON p.product_category_id = c.id
+            product_category c ON p.categoryId = c.id
         LEFT JOIN 
             product_stock s ON p.id = s.product_id
         WHERE 

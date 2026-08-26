@@ -127,8 +127,8 @@ public class ProductUpdateController {
                 form.setStock(dbProduct.get("quantity") != null ? ((Number) dbProduct.get("quantity")).intValue() : 0);
                 form.setImageUrl(dbProduct.get("image_url") != null ? (String) dbProduct.get("image_url")
                         : "/images/Shop_Img1.jpeg");
-                form.setCategoryId(dbProduct.get("product_category_id") != null
-                        ? ((Number) dbProduct.get("product_category_id")).intValue()
+                form.setCategoryId(dbProduct.get("categoryId") != null
+                        ? ((Number) dbProduct.get("categoryId")).intValue()
                         : 1);
             } else {
                 form.setId(productId);

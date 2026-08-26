@@ -36,51 +36,9 @@
 
     <!-- ▼ ProjectCategory を ProductCategory に修正済み -->
     <select id="findAllCategories" resultType="com.example.fullness.stationary.entity.ProductCategory">
-        SELECT id, name
-        FROM product_category
+        SELECT id, name 
+        FROM product_category 
         ORDER BY id ASC
-    </select>
-
-    <!--↓↓↓ここからUC12↓↓↓-->
-
-    <!-- 1. 商品名から商品情報を検索するSQL（重複チェック用） -->
-    <!-- 削除されていない(delete_flag = 0)商品から同名のものを検索します -->
-    <select id="findByName" resultMap="ProductResult">
-        SELECT id, name, price, image_url, product_category_id, delete_flag
-        FROM product
-        WHERE name = #{name} AND delete_flag = 0
-    </select>
-
-    <!-- 2. 商品情報を更新（修正）するSQL -->
-    <!-- 指定された商品ID(id)のデータに対して、新しい商品名と価格を上書き保存します -->
-    <update id="updateProduct">
-           <!-- 💡【画像URLのバグ完全解決】
-         Serviceから image_url が null で届いた場合は、COALESCE（コアレス）関数を使い、
-         データベースに元々登録されている「本物の正しい画像パス（image_url）」をそのまま維持して上書きします！ -->
-    
-    
-              <!-- 2. 商品情報を更新（修正）するSQL -->
-  
-         UPDATE product
-         SET name = #{name},
-            price = #{price},
-            product_category_id = #{productCategoryId}, <!-- 💡エンティティの変数名（大文字小文字も完全同期） -->
-            image_url = #{imageUrl}                    <!-- 💡エンティティの変数名（大文字小文字も完全同期） -->
-        WHERE id = #{id}
-    </update>
-
- <!-- 💡【追加】カテゴリIDからカテゴリ名を1件取得するSQL
-         確認画面で選択された正しいカテゴリ名を表示するために、Javaから呼び出します -->
-      <select id="findProductMapByIdForEdit" resultType="java.util.Map">
-        SELECT p.id, p.name, p.price, p.image_url, p.product_category_id, s.quantity
-        FROM product p
-        LEFT JOIN product_stock s ON p.id = s.product_id
-        WHERE p.id = #{productId}
-    </select>
-     <select id="findCategoryNameById" resultType="string">
-        SELECT name
-        FROM product_category
-        WHERE id = #{categoryId}
     </select>
 
 </mapper>
