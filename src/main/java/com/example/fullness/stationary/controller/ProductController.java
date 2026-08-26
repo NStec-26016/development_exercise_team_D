@@ -1,6 +1,7 @@
 package com.example.fullness.stationary.controller;
 
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.security.core.Authentication;
@@ -40,7 +41,17 @@ public class ProductController {
 
         try {
             model.addAttribute("categories", productService.findAllCategories());
-            Page<Product> productPage = productService.findProductsByCategory(categoryId, pageable);
+
+            // HTML側（1始まり）とSpring（0始まり）のズレを調整する処理
+            Pageable adjustedPageable = pageable;
+            if (pageable.getPageNumber() > 0) {
+                adjustedPageable = PageRequest.of(
+                        pageable.getPageNumber() - 1,
+                        pageable.getPageSize(),
+                        pageable.getSort());
+            }
+
+            Page<Product> productPage = productService.findProductsByCategory(categoryId, adjustedPageable);
 
             model.addAttribute("products", productPage.getContent());
             model.addAttribute("currentPage", productPage.getNumber() + 1);

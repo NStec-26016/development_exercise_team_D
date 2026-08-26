@@ -40,13 +40,18 @@ class ProductServiceTest {
         assertNotNull(result);
         // 初期データの通り、カテゴリの総件数が 4件 であることを検証します
         assertEquals(4, result.size());
-        // 1番目のカテゴリ名が「文房具」であることを検証します
+
+        // 各インデックスのインスタンス（IDと名前）が正しく一致していることを検証します
+        assertEquals(1, result.get(0).getId());
         assertEquals("文房具", result.get(0).getName());
-        // 2番目のカテゴリ名が「ガジェット」であることを検証します
+
+        assertEquals(2, result.get(1).getId());
         assertEquals("ガジェット", result.get(1).getName());
-        // 3番目のカテゴリ名が「ファッション」であることを検証します
+
+        assertEquals(3, result.get(2).getId());
         assertEquals("ファッション", result.get(2).getName());
-        // 4番目のカテゴリ名が「日用品」であることを検証します
+
+        assertEquals(4, result.get(3).getId());
         assertEquals("日用品", result.get(3).getName());
     }
 

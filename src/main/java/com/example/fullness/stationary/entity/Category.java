@@ -5,6 +5,6 @@ import lombok.Data;
 
 @Data
 public class Category implements Serializable {
-    private Integer id;   // HTMLの ${cat.id} に合わせる
-    private String name;  // HTMLの ${cat.name} に合わせる
+    private Integer id;
+    private String name;
 }

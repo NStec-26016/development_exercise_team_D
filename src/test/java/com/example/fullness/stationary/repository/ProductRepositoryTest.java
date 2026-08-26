@@ -13,7 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 
 import com.example.fullness.stationary.entity.Product;
-import com.example.fullness.stationary.entity.ProductCategory; // ProductCategoryに修正
+import com.example.fullness.stationary.entity.ProductCategory;
 
 /**
  * ProductRepositoryの単体テストクラス。
@@ -36,13 +36,18 @@ class ProductRepositoryTest {
         assertNotNull(categories);
         // 取得したカテゴリの件数が 4件 であることを検証します
         assertEquals(4, categories.size());
-        // 1番目のカテゴリ名が「文房具」であることを検証します
+
+        // 各インデックスのインスタンス（IDと名前）が正しく一致していることを検証します
+        assertEquals(1, categories.get(0).getId());
         assertEquals("文房具", categories.get(0).getName());
-        // 2番目のカテゴリ名が「ガジェット」であることを検証します
+
+        assertEquals(2, categories.get(1).getId());
         assertEquals("ガジェット", categories.get(1).getName());
-        // 3番目のカテゴリ名が「ファッション」であることを検証します
+
+        assertEquals(3, categories.get(2).getId());
         assertEquals("ファッション", categories.get(2).getName());
-        // 4番目のカテゴリ名が「日用品」であることを検証します
+
+        assertEquals(4, categories.get(3).getId());
         assertEquals("日用品", categories.get(3).getName());
     }
 
@@ -56,6 +61,14 @@ class ProductRepositoryTest {
         assertNotNull(products);
         // 1ページあたりの取得件数が 10件 であることを検証します
         assertEquals(10, products.size());
+
+        // 1件目の内容（ID: 1、商品名: 黒筆ペン）が正しいことを検証します
+        assertEquals(1, products.get(0).getId());
+        assertEquals("黒筆ペン", products.get(0).getName());
+
+        // 10件目の内容（ID: 10、商品名: カラーペン 48色）が正しいことを検証します
+        assertEquals(10, products.get(9).getId());
+        assertEquals("カラーペン 48色", products.get(9).getName());
     }
 
     @Test
@@ -81,6 +94,14 @@ class ProductRepositoryTest {
         assertNotNull(products);
         // 1ページあたりの取得件数が 10件 であることを検証します
         assertEquals(10, products.size());
+
+        // 1件目の内容（ID: 1、商品名: 黒筆ペン）が正しいことを検証します
+        assertEquals(1, products.get(0).getId());
+        assertEquals("黒筆ペン", products.get(0).getName());
+
+        // 10件目の内容（ID: 10、商品名: カラーペン 48色）が正しいことを検証します
+        assertEquals(10, products.get(9).getId());
+        assertEquals("カラーペン 48色", products.get(9).getName());
     }
 
     @Test
