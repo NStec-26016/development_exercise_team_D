@@ -34,7 +34,7 @@ public class ProductRegistrationForm implements Serializable {
     private String categoryName;
     private String imagePath;
 
-    // :bulb:【最重要：DB保存用】MyBatisが #{imageUrl} を読み込みに来たとき、200文字以内の短いパスを自動で返却します
+    // 💡【最重要：DB保存用】MyBatisが #{imageUrl} を読み込みに来たとき、200文字以内の短いパスを自動で返却します
     public String getImageUrl() {
         return this.imagePath;
     }

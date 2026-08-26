@@ -55,4 +55,32 @@ public class EmployeeAccountRepositoryTest {
         // 「account == null」を検証
         assertThat(account).isNull();
     }
+
+    // 【UC09 アカウント登録】1. 重複していないアカウント名でのカウント数取得 (期待値: 0)
+    @Test
+    @Sql("/com/example/fullness/stationary/repository/EmployeeAccountRepository_insertAndCount.sql")
+    void EmployeeAccountRepositoryTest_countByName_OK() {
+        // まだ誰も使っていないアカウント名「watanabe4」を指定して実行
+        int count = repository.countByName("watanabe4");
+
+        // 重複なし（0件）であることを検証
+        assertThat(count).isEqualTo(0);
+    }
+
+    // 【UC09 アカウント登録】2. 新規アカウントの登録処理 (期待値: 登録成功)
+    @Test
+    @Sql("/com/example/fullness/stationary/repository/EmployeeAccountRepository_insertAndCount.sql")
+    void EmployeeAccountRepositoryTest_insertEmployeeAccount_OK() {
+        // テスト用データ（Entity）の準備
+        EmployeeAccount account = new EmployeeAccount();
+        account.setEmployeeId(4); // 事前SQLで用意した渡辺太郎のID
+        account.setName("watanabe4");
+        account.setPassword("hashedPasswordXYZ");
+
+        // 登録処理（INSERT）を実行
+        int rows = repository.insertEmployeeAccount(account);
+
+        // 1行正常に挿入（影響を受けた行数が1）されたことを検証
+        assertThat(rows).isEqualTo(1);
+    }
 }

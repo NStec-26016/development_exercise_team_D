@@ -51,6 +51,11 @@ dependencies {
 
 	//UC017/controller単体テストにて追加
 	testImplementation 'org.springframework.security:spring-security-test'
+ 
+
+
+	//UC9にて追加
+	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
 
 	testImplementation 'com.h2database:h2'
 

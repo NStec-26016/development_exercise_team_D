@@ -8,18 +8,17 @@
         <result property="price" column="price" />
         <result property="imageUrl" column="image_url" />
         <result property="productCategoryId" column="product_category_id" />
-        <result property="deleteFlag" column="delete_flag" />
     </resultMap>
 
     <select id="findAllWithPaging" resultMap="ProductResult">
-        SELECT id, name, price, image_url, product_category_id, delete_flag
+        SELECT id, name, price, image_url, product_category_id
         FROM product
         ORDER BY id ASC
         LIMIT #{limit} OFFSET #{offset}
     </select>
 
     <select id="findByCategoryIdWithPaging" resultMap="ProductResult">
-        SELECT id, name, price, image_url, product_category_id, delete_flag
+        SELECT id, name, price, image_url, product_category_id
         FROM product
         WHERE product_category_id = #{categoryId}
         ORDER BY id ASC
@@ -32,13 +31,6 @@
 
     <select id="countByCategoryId" resultType="long">
         SELECT COUNT(*) FROM product WHERE product_category_id = #{categoryId}
-    </select>
-
-    <!-- ▼ ProjectCategory を ProductCategory に修正済み -->
-    <select id="findAllCategories" resultType="com.example.fullness.stationary.entity.ProductCategory">
-        SELECT id, name 
-        FROM product_category 
-        ORDER BY id ASC
     </select>
 
 </mapper>
