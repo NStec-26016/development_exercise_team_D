@@ -35,7 +35,7 @@ class ProductRegistrationServiceTest {
         testForm.setName("えんぴつ");
         testForm.setPrice(70);
         testForm.setStock(10);
-        testForm.setImagePath("black_pen_o.jpg");
+        testForm.setImageUrl("black_pen_o.jpg");
 
         productRegistrationService.registerProduct(testForm);
 

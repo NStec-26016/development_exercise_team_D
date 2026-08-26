@@ -12,7 +12,7 @@
             image_url,
             delete_flag
         ) VALUES (
-            #{product_category_id},
+            #{productCategoryId},
             #{name},
             #{price},
             #{imageUrl},

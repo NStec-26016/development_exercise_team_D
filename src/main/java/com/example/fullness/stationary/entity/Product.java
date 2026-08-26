@@ -1,13 +1,11 @@
 package com.example.fullness.stationary.entity;
 
 import java.io.Serializable;
-import java.math.BigDecimal;
 import lombok.Data;
 
 @Data
 public class Product implements Serializable {
     private Integer id;
-    // UC10追加
     private Integer productCategoryId;
 
     private String name;
@@ -21,4 +19,5 @@ public class Product implements Serializable {
     private Integer deleteFlag;
 
     private Integer stock; // ★ 追加
+
 }
