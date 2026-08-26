@@ -13,4 +13,4 @@ public class ProductStock implements Serializable {
 
     private Integer quantity;
 
-}
+    }
