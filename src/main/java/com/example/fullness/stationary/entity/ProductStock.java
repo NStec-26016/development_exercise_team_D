@@ -9,7 +9,8 @@ public class ProductStock implements Serializable {
 
     private Integer id;
 
-    private Integer productId;
+    private Integer pruductId;
 
     private Integer quantity;
+
 }

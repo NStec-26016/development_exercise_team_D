@@ -32,10 +32,10 @@ public class ProductRegistrationForm implements Serializable {
     private MultipartFile image;
 
     private String categoryName;
-    private String imagePath;
+    private String imageUrl;
 
     // :bulb:【最重要：DB保存用】MyBatisが #{imageUrl} を読み込みに来たとき、200文字以内の短いパスを自動で返却します
     public String getImageUrl() {
-        return this.imagePath;
+        return this.imageUrl;
     }
 }
